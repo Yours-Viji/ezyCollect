@@ -155,7 +155,7 @@ class HomeViewModel @Inject constructor(
         }*/
     }
 
-    /*fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
+    fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
         loadingManager.show()
         viewModelScope.launch {
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
@@ -230,7 +230,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-    }*/
+    }
 
    /* fun getProductDetails(barCode:String) {
         loadingManager.show()

@@ -20,6 +20,18 @@ class ShoppingUseCase @Inject constructor(
         return authRepository.createNewShoppingCart()
     }
 
+    suspend  fun addToCart(name: String,quantity:Int,price:Double): NetworkResponse<ShoppingCartDetails> {
+        return authRepository.addProductToShoppingCart(name,quantity,price)
+    }
+
+    suspend  fun editProductInCart(price: Double,quantity:Int,id:Int): NetworkResponse<ShoppingCartDetails> {
+        return authRepository.editProductInCart(id,price,quantity)
+    }
+
+    suspend  fun deleteProductFromCart(id:Int): NetworkResponse<ShoppingCartDetails> {
+        return authRepository.deleteProductFromShoppingCart(id)
+    }
+
     suspend  fun getProductDetails(barCode: String): NetworkResponse<ProductInfo> {
         return authRepository.getProductDetails(barCode)
     }
@@ -39,14 +51,14 @@ class ShoppingUseCase @Inject constructor(
     /*suspend  fun addToCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
         return authRepository.addProductToShoppingCart(barCode,quantity)
     }
-*/
+*//*
     suspend  fun editProductInCart(barCode: String,quantity:Int,id:Int): NetworkResponse<ShoppingCartDetails> {
         return authRepository.editProductInCart(barCode,id,quantity)
     }
 
     suspend  fun deleteProductFromCart(barCode: String,id:Int): NetworkResponse<ShoppingCartDetails> {
         return authRepository.deleteProductFromShoppingCart(barCode,id)
-    }
+    }*/
 
 
 }

@@ -101,24 +101,24 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
     }
-   /* override suspend fun addProductToShoppingCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
-        return safeApiCallRaw { authApi.addProductToCartApi(AddProductToCartRequest(barCode,quantity)) }
-            .also { result ->
-                if (result is NetworkResponse.Success) {
-                }
-            }
-    }*/
-
-    override suspend fun editProductInCart(barCode: String,id:Int,quantity:Int): NetworkResponse<ShoppingCartDetails> {
-        return safeApiCallRaw { authApi.editProductQuantity(preferencesManager.getShoppingCartId(),EditProductRequest(id,barCode,quantity)) }
+    override suspend fun addProductToShoppingCart(name: String,quantity:Int,price:Double): NetworkResponse<ShoppingCartDetails> {
+        return safeApiCallRaw { authApi.addProductToCartApi(AddProductToCartRequest(name,quantity,price)) }
             .also { result ->
                 if (result is NetworkResponse.Success) {
                 }
             }
     }
 
-    override suspend fun deleteProductFromShoppingCart(barCode: String,id:Int): NetworkResponse<ShoppingCartDetails> {
-        return safeApiCallRaw { authApi.deleteProductFromCart(preferencesManager.getShoppingCartId(),DeleteProductInCartRequest(id,barCode)) }
+    override suspend fun editProductInCart(id:Int,price: Double,quantity:Int): NetworkResponse<ShoppingCartDetails> {
+        return safeApiCallRaw { authApi.editProductQuantity(preferencesManager.getShoppingCartId(),id,EditProductRequest(price,quantity)) }
+            .also { result ->
+                if (result is NetworkResponse.Success) {
+                }
+            }
+    }
+
+    override suspend fun deleteProductFromShoppingCart(id:Int): NetworkResponse<ShoppingCartDetails> {
+        return safeApiCallRaw { authApi.deleteProductFromCart(preferencesManager.getShoppingCartId(),id) }
             .also { result ->
                 if (result is NetworkResponse.Success) {
                 }

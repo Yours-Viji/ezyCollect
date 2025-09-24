@@ -48,6 +48,24 @@ interface AuthApi {
     @POST("/cart")
     suspend fun createShoppingCart(): Response<CreateCartResponse>
 
+
+    @POST("/cart/items")
+    suspend fun addProductToCartApi(@Body dddProductToCartRequest: AddProductToCartRequest): Response<ShoppingCartDetails>
+
+    @HTTP(method = "DELETE", path = "/cart/{cart_Id}/items/{id}", hasBody = true)
+    suspend fun deleteProductFromCart(
+        @Path(value = "cart_Id", encoded = true) cartId: String,
+        @Path(value = "id", encoded = true) productId: Int,
+    ): Response<ShoppingCartDetails>
+
+    @PUT("/cart/{cart_Id}/items/{id}")
+    suspend fun editProductQuantity(
+        @Path(value = "cart_Id", encoded = true) cartId: String,
+        @Path(value = "id", encoded = true) productId: Int,
+        @Body editProductRequest: EditProductRequest
+    ): Response<ShoppingCartDetails>
+
+
     @POST("/ezyCart/cs/login")
     suspend fun employeeLoginApi(@Body employeeLoginRequest: EmployeeLoginRequest): Response<ApiResponse<EmployeeLoginResponse>>
 
@@ -76,8 +94,8 @@ interface AuthApi {
     suspend fun getCartShoppingDetails(
         @Path(value = "cart_id", encoded = true) cartId: String): Response<ShoppingCartDetails>
 
-    @POST("/v2/ezyCart/cart/item")
-    suspend fun addProductToCartApi(@Body dddProductToCartRequest: AddProductToCartRequest): Response<ShoppingCartDetails>
+   /* @POST("/v2/ezyCart/cart/item")
+    suspend fun addProductToCartApi(@Body dddProductToCartRequest: AddProductToCartRequest): Response<ShoppingCartDetails>*/
 
     @GET("/v1/ezyCart/cart/review/{cart_id}")
     suspend fun getPaymentSummary(

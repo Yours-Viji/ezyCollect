@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.retailetics.ezycollect.R
+import com.retailetics.ezycollect.data.remote.dto.Item
 
 // Data class for items
 data class CartItem(
@@ -75,7 +76,7 @@ data class CartItem(
 fun PaymentEntryScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-   // val cartDataList = viewModel.cartDataList.collectAsState()
+    val cartDataList = viewModel.cartDataList.collectAsState()
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf("") }
     var cartItems by remember { mutableStateOf(listOf<CartItem>()) }
@@ -229,10 +230,11 @@ fun PaymentEntryScreen(
                                             name = if (itemName.isBlank()) "Item ${nextItemId-1}" else itemName,
                                             price = price
                                         )
+                                        viewModel.addProductToShoppingCart(itemName,1,price)
                                         cartItems = cartItems + newItem
                                         itemName = ""
                                         itemPrice = ""
-                                       // viewModel.addProductToShoppingCart(itemName,1,price)
+
                                     }
                                 }
                             },
@@ -292,7 +294,7 @@ fun PaymentEntryScreen(
                             .fillMaxSize()
                             .padding(8.dp)
                     ) {
-                        items(cartItems.reversed().take(2)) { item -> // Show only up to 5 items
+                        items(cartDataList.value.reversed().take(2)) { item -> // Show only up to 5 items
                             CartItemRow(
                                 item = item,
                                 onRemove = {
@@ -392,7 +394,7 @@ fun PaymentEntryScreen(
                     )
 
                     LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(cartItems) { item ->
+                        items(cartDataList.value) { item ->
                             CartItemRow(
                                 item = item,
                                 onRemove = {
@@ -457,7 +459,7 @@ fun PaymentEntryScreen(
 
 @Composable
 fun CartItemRow(
-    item: CartItem,
+    item: Item,
     onRemove: () -> Unit,
     onUpdateQuantity: (Int) -> Unit
 ) {
@@ -474,12 +476,12 @@ fun CartItemRow(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.name,
+                    text = item.product_name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "RM${"%.2f".format(item.price)} each",
+                    text = "RM${"%.2f".format(item.price.toDouble() ?: 0.0)} each",
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -517,7 +519,7 @@ fun CartItemRow(
             }
 
             Text(
-                text = "RM${"%.2f".format(item.price * item.quantity)}",
+                text = "RM${"%.2f".format(item.price.toDouble() * item.quantity)}",
                 modifier = Modifier.padding(horizontal = 8.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
