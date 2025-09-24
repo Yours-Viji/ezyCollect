@@ -30,6 +30,7 @@ import retrofit2.http.Header
 import retrofit2.http.HeaderMap
 import retrofit2.http.Headers
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
@@ -58,7 +59,7 @@ interface AuthApi {
         @Path(value = "id", encoded = true) productId: Int,
     ): Response<ShoppingCartDetails>
 
-    @PUT("/cart/{cart_Id}/items/{id}")
+    @PATCH("/cart/{cart_Id}/items/{id}")
     suspend fun editProductQuantity(
         @Path(value = "cart_Id", encoded = true) cartId: String,
         @Path(value = "id", encoded = true) productId: Int,

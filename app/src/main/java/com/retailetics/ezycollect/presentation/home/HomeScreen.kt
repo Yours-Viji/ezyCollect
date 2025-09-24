@@ -63,13 +63,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.retailetics.ezycollect.R
 import com.retailetics.ezycollect.data.remote.dto.Item
 
-// Data class for items
+/*// Data class for items
 data class CartItem(
     val id: Int,
     var name: String,
     var price: Double,
     var quantity: Int = 1
-)
+)*/
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,13 +77,15 @@ fun PaymentEntryScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val cartDataList = viewModel.cartDataList.collectAsState()
+    val shoppingCartInfo = viewModel.shoppingCartInfo.collectAsState()
+
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf("") }
-    var cartItems by remember { mutableStateOf(listOf<CartItem>()) }
+    //var cartItems by remember { mutableStateOf(listOf<CartItem>()) }
     var showCartDialog by remember { mutableStateOf(false) }
     var nextItemId by remember { mutableStateOf(1) }
 
-    val totalAmount = cartItems.sumOf { it.price * it.quantity }
+    val totalAmount = shoppingCartInfo.value?.subtotal ?: 0
 
     var showQrDialog = remember { mutableStateOf(false) }
     var showPaymentDialog = remember { mutableStateOf(false) }
@@ -106,7 +108,7 @@ fun PaymentEntryScreen(
     if (showPaymentDialog.value) {
 
         QrPaymentAlert(
-            amount = "${"%.2f".format(totalAmount)}",
+            amount = "${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
             qrPainter = painterResource(id = R.drawable.baseline_qr_code_2_24), // replace with your QR
             onDismiss = { showPaymentDialog.value = false }
         )
@@ -225,13 +227,13 @@ fun PaymentEntryScreen(
                                 if (itemPrice.isNotBlank()) {
                                     val price = itemPrice.toDoubleOrNull() ?: 0.0
                                     if (price > 0) {
-                                        val newItem = CartItem(
+                                        /*val newItem = CartItem(
                                             id = nextItemId++,
                                             name = if (itemName.isBlank()) "Item ${nextItemId-1}" else itemName,
                                             price = price
-                                        )
+                                        )*/
                                         viewModel.addProductToShoppingCart(itemName,1,price)
-                                        cartItems = cartItems + newItem
+                                        //cartItems = cartItems + newItem
                                         itemName = ""
                                         itemPrice = ""
 
@@ -262,7 +264,7 @@ fun PaymentEntryScreen(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = Color.White
                 ),
-                enabled = cartItems.isNotEmpty()
+                enabled = cartDataList.value.isNotEmpty()
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_cart),
@@ -270,11 +272,11 @@ fun PaymentEntryScreen(
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("View Cart (${cartItems.size})")
+                Text("View Cart (${cartDataList.value.size})")
             }
 
             // Recent Items Section - Limited height and scrollable
-            if (cartItems.isNotEmpty()) {
+            if (cartDataList.value.isNotEmpty()) {
                 Text(
                     text = "Recent Items",
                     fontSize = 18.sp,
@@ -298,13 +300,15 @@ fun PaymentEntryScreen(
                             CartItemRow(
                                 item = item,
                                 onRemove = {
-                                    cartItems = cartItems.filter { it.id != item.id }
+                                    viewModel.deleteProductFromShoppingCart(item.id)
+                                    //cartItems = cartDataList.value.filter { it.id != item.id }
                                 },
                                 onUpdateQuantity = { newQuantity ->
-                                    cartItems = cartItems.map {
+                                    viewModel.editProductInShoppingCart(item.price.toDouble(),newQuantity,item.id)
+                                   /* cartItems = cartItems.map {
                                         if (it.id == item.id) it.copy(quantity = newQuantity)
                                         else it
-                                    }
+                                    }*/
                                 }
                             )
                             Spacer(modifier = Modifier.height(4.dp))
@@ -349,7 +353,7 @@ fun PaymentEntryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Total: RM${"%.2f".format(totalAmount)}",
+                        text = "Total: RM${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -362,7 +366,7 @@ fun PaymentEntryScreen(
                             // This button should ideally navigate or trigger an action
                             // For now, we can show a Toast or a Snackbar if needed for testing
                         },
-                        enabled = cartItems.isNotEmpty(), // Enable only if there are items
+                        enabled = cartDataList.value.isNotEmpty(), // Enable only if there are items
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White
@@ -398,13 +402,15 @@ fun PaymentEntryScreen(
                             CartItemRow(
                                 item = item,
                                 onRemove = {
-                                    cartItems = cartItems.filter { it.id != item.id }
+                                    viewModel.deleteProductFromShoppingCart(item.id)
+                                    //cartItems = cartItems.filter { it.id != item.id }
                                 },
                                 onUpdateQuantity = { newQuantity ->
-                                    cartItems = cartItems.map {
+                                    viewModel.editProductInShoppingCart(item.price.toDouble(),newQuantity,item.id)
+                                  /*  cartItems = cartItems.map {
                                         if (it.id == item.id) it.copy(quantity = newQuantity)
                                         else it
-                                    }
+                                    }*/
                                 }
                             )
                         }
@@ -418,7 +424,7 @@ fun PaymentEntryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Total: RM${"%.2f".format(totalAmount)}",
+                            text = "Total: RM${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
