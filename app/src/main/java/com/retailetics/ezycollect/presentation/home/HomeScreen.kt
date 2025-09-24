@@ -77,7 +77,7 @@ fun PaymentEntryScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val cartDataList = viewModel.cartDataList.collectAsState()
-    val shoppingCartInfo = viewModel.shoppingCartInfo.collectAsState()
+    val totalAmount = viewModel.totalAmount.collectAsState()
 
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf("") }
@@ -85,7 +85,6 @@ fun PaymentEntryScreen(
     var showCartDialog by remember { mutableStateOf(false) }
     var nextItemId by remember { mutableStateOf(1) }
 
-    val totalAmount = shoppingCartInfo.value?.subtotal ?: 0
 
     var showQrDialog = remember { mutableStateOf(false) }
     var showPaymentDialog = remember { mutableStateOf(false) }
@@ -108,7 +107,7 @@ fun PaymentEntryScreen(
     if (showPaymentDialog.value) {
 
         QrPaymentAlert(
-            amount = "${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
+            amount = "%.2f".format(totalAmount.value),
             qrPainter = painterResource(id = R.drawable.baseline_qr_code_2_24), // replace with your QR
             onDismiss = { showPaymentDialog.value = false }
         )
@@ -353,7 +352,7 @@ fun PaymentEntryScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Total: RM${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
+                        text = "Total: RM${"%.2f".format(totalAmount.value)}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -424,7 +423,7 @@ fun PaymentEntryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Total: RM${"%.2f".format(totalAmount.toDouble() ?: 0.0)}",
+                            text = "Total: RM${"%.2f".format(totalAmount.value)}",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )

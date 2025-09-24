@@ -40,6 +40,9 @@ class HomeViewModel @Inject constructor(
     private val _cartCount = MutableStateFlow(0)
     val cartCount: StateFlow<Int> = _cartCount.asStateFlow()
 
+    private val _totalAmount = MutableStateFlow(0.0)
+    val totalAmount: StateFlow<Double> = _totalAmount.asStateFlow()
+
     private val _shoppingCartInfo = MutableStateFlow<ShoppingCartDetails?>(null)
     val shoppingCartInfo: StateFlow<ShoppingCartDetails?> = _shoppingCartInfo.asStateFlow()
 
@@ -164,8 +167,10 @@ class HomeViewModel @Inject constructor(
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false
                     )
+
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
+                    _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
                     getPaymentSummary()
 
@@ -192,6 +197,7 @@ class HomeViewModel @Inject constructor(
                     )
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
+                    _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
                     getPaymentSummary()
                 }
@@ -218,6 +224,7 @@ class HomeViewModel @Inject constructor(
                     )
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
+                    _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
                     getPaymentSummary()
                 }
