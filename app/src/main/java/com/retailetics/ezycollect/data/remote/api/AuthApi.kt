@@ -45,6 +45,9 @@ interface AuthApi {
     @POST("/auth/register")
     suspend fun registration(@Body registrationRequest: RegistrationRequest): Response<ApiResponse<RegistrationResult>>
 
+    @POST("/cart")
+    suspend fun createShoppingCart(): Response<CreateCartResponse>
+
     @POST("/ezyCart/cs/login")
     suspend fun employeeLoginApi(@Body employeeLoginRequest: EmployeeLoginRequest): Response<ApiResponse<EmployeeLoginResponse>>
 
@@ -66,8 +69,8 @@ interface AuthApi {
         @QueryMap params: Map<String, String>
     ): Response<ProductPriceInfo>
 
-    @POST("/v2/ezyCart/cart")
-   suspend fun createShoppingCart(@Body createNewCartRequest: CreateCartRequest): Response<CreateCartResponse>
+  /*  @POST("/v2/ezyCart/cart")
+   suspend fun createShoppingCart(@Body createNewCartRequest: CreateCartRequest): Response<CreateCartResponse>*/
 
     @GET("/ezyCart/cart/{cart_id}")
     suspend fun getCartShoppingDetails(

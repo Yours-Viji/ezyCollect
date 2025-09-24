@@ -36,10 +36,10 @@ class ShoppingUseCase @Inject constructor(
         return authRepository.getPaymentSummary()
     }
 
-    suspend  fun addToCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
+    /*suspend  fun addToCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
         return authRepository.addProductToShoppingCart(barCode,quantity)
     }
-
+*/
     suspend  fun editProductInCart(barCode: String,quantity:Int,id:Int): NetworkResponse<ShoppingCartDetails> {
         return authRepository.editProductInCart(barCode,id,quantity)
     }

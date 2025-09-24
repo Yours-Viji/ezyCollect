@@ -78,11 +78,10 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun createNewShoppingCart(): NetworkResponse<CreateCartResponse> {
-        return safeApiCallRaw { authApi.createShoppingCart(getCreateCartRequestData()) }
+        return safeApiCallRaw { authApi.createShoppingCart() }
             .also { result ->
                 if (result is NetworkResponse.Success) {
-                    preferencesManager.saveCartId(result.data.cartId)
-                    preferencesManager.saveAuthToken(result.data.token)
+                    preferencesManager.saveCartId("${result.data.id}")
                 }
             }
     }
@@ -102,13 +101,13 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
     }
-    override suspend fun addProductToShoppingCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
+   /* override suspend fun addProductToShoppingCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails> {
         return safeApiCallRaw { authApi.addProductToCartApi(AddProductToCartRequest(barCode,quantity)) }
             .also { result ->
                 if (result is NetworkResponse.Success) {
                 }
             }
-    }
+    }*/
 
     override suspend fun editProductInCart(barCode: String,id:Int,quantity:Int): NetworkResponse<ShoppingCartDetails> {
         return safeApiCallRaw { authApi.editProductQuantity(preferencesManager.getShoppingCartId(),EditProductRequest(id,barCode,quantity)) }

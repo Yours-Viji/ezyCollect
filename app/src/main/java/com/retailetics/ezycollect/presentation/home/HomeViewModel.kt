@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.retailetics.ezycollect.data.datastore.PreferencesManager
+import com.retailetics.ezycollect.data.remote.dto.Item
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 
 import com.retailetics.ezycollect.data.remote.dto.ShoppingCartDetails
@@ -33,8 +34,8 @@ class HomeViewModel @Inject constructor(
     private val _stateFlow = MutableStateFlow(HomeState())
     val stateFlow: StateFlow<HomeState> = _stateFlow.asStateFlow()
 
-   /* private val _cartDataList = MutableStateFlow<List<Item>>(emptyList())
-    val cartDataList: StateFlow<List<Item>> = _cartDataList.asStateFlow()*/
+    private val _cartDataList = MutableStateFlow<List<Item>>(emptyList())
+    val cartDataList: StateFlow<List<Item>> = _cartDataList.asStateFlow()
 
     private val _cartCount = MutableStateFlow(0)
     val cartCount: StateFlow<Int> = _cartCount.asStateFlow()
@@ -78,12 +79,12 @@ class HomeViewModel @Inject constructor(
     }
     fun initNewShopping(){
         clearCartDetails()
-        //createNewShoppingCart()
+        createNewShoppingCart()
     }
    private fun clearCartDetails(){
 
     }
-   /* private fun createNewShoppingCart() {
+    private fun createNewShoppingCart() {
         loadingManager.show()
         clearCartDetails()
         viewModelScope.launch {
@@ -128,7 +129,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
-    }*/
+    }
 
     private fun getPaymentSummary() {
        /* loadingManager.show()

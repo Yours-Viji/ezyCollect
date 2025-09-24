@@ -21,7 +21,7 @@ interface AuthRepository {
     suspend fun createNewShoppingCart(): NetworkResponse<CreateCartResponse>
     suspend fun getShoppingCartDetails(): NetworkResponse<ShoppingCartDetails>
     suspend fun getPaymentSummary(): NetworkResponse<ShoppingCartDetails>
-    suspend fun addProductToShoppingCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails>
+   // suspend fun addProductToShoppingCart(barCode: String,quantity:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun deleteProductFromShoppingCart(barCode: String,id:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun editProductInCart(barCode: String,id:Int,quantity:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun saveAuthToken(token: String)
