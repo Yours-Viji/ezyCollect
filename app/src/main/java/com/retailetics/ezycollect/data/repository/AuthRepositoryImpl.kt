@@ -58,7 +58,7 @@ class AuthRepositoryImpl @Inject constructor(
 
 
     override suspend fun getShoppingCartDetails(): NetworkResponse<ShoppingCartDetails> {
-        return safeApiCallRaw { authApi.getCartShoppingDetails(preferencesManager.getShoppingCartId()) }
+        return safeApiCallRaw { authApi.getCartShoppingDetails() }
             .also { result ->
                 if (result is NetworkResponse.Success) {
                 }

@@ -51,9 +51,7 @@ interface AuthApi {
 
 
 
-    @GET("/ezyCart/cart/{cart_id}")
-    suspend fun getCartShoppingDetails(
-        @Path(value = "cart_id", encoded = true) cartId: String): Response<ShoppingCartDetails>
-
+    @GET("/cart")
+    suspend fun getCartShoppingDetails(): Response<ShoppingCartDetails>
 
 }

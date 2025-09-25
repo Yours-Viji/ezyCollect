@@ -134,30 +134,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getPaymentSummary() {
-       /* loadingManager.show()
-        viewModelScope.launch {
-            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
-
-            when (val result = shoppingUseCase.getPaymentSummary()) {
-                is NetworkResponse.Success -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false
-                    )
-                    _shoppingCartInfo.value=result.data
-                    loadingManager.hide()
-                }
-                is NetworkResponse.Error -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        error = result.message,
-                    )
-                    loadingManager.hide()
-                }
-            }
-        }*/
-    }
-
     fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
         loadingManager.show()
         viewModelScope.launch {
@@ -172,7 +148,6 @@ class HomeViewModel @Inject constructor(
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
-                    getPaymentSummary()
 
                 }
                 is NetworkResponse.Error -> {
@@ -199,7 +174,6 @@ class HomeViewModel @Inject constructor(
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
-                    getPaymentSummary()
                 }
                 is NetworkResponse.Error -> {
                     _stateFlow.value = _stateFlow.value.copy(
@@ -226,7 +200,6 @@ class HomeViewModel @Inject constructor(
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal.toDouble()
                     loadingManager.hide()
-                    getPaymentSummary()
                 }
                 is NetworkResponse.Error -> {
                     _stateFlow.value = _stateFlow.value.copy(
@@ -239,56 +212,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-   /* fun getProductDetails(barCode:String) {
-        loadingManager.show()
-        viewModelScope.launch {
-            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
-            _productInfo.value = null
-            when (val result = shoppingUseCase.getProductDetails(barCode)) {
-                is NetworkResponse.Success -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false
-                    )
-                    _productInfo.value=result.data
-                    getPriceDetails(barCode)
-                }
-                is NetworkResponse.Error -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        error = result.message,
-                    )
-                    loadingManager.hide()
-                    //End of input at line 1 column 1 path
-                }
-            }
-        }
-    }*/
-    fun resetProductInfoDetails() {
 
-    }
-
-   /* private fun getPriceDetails(barCode:String) {
-        viewModelScope.launch {
-            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
-            _priceDetails.value = null
-            when (val result = shoppingUseCase.getPriceDetails(barCode)) {
-                is NetworkResponse.Success -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false
-                    )
-                    _priceDetails.value=result.data
-                    loadingManager.hide()
-                }
-                is NetworkResponse.Error -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        error = result.message,
-                    )
-                    loadingManager.hide()
-                }
-            }
-        }
-    }*/
 
 
 }
