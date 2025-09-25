@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetAuthDataUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
-    operator fun invoke(): Flow<Boolean> {
+    operator fun invoke(): Flow<Boolean?> {
         return authRepository.isDeviceActivated()
     }
 

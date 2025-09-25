@@ -143,7 +143,7 @@ class AuthRepositoryImpl @Inject constructor(
         return preferencesManager.getAuthToken()
     }
 
-    override fun isDeviceActivated(): Flow<Boolean> {
+    override fun isDeviceActivated(): Flow<Boolean?> {
         return preferencesManager.isDeviceActivated()
     }
 

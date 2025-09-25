@@ -23,6 +23,6 @@ interface AuthRepository {
     suspend fun getTransactionReport(startDate: String,endDate:String): NetworkResponse<TransactionReportData>
     suspend fun saveAuthToken(token: String)
     suspend fun getAuthToken(): String?
-    fun isDeviceActivated(): Flow<Boolean>
+    fun isDeviceActivated(): Flow<Boolean?>
     fun getCartId(): Flow<String>
 }

@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -75,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-                    when (isActivated.value) {
+                    /*when (isActivated.value) {
                         null -> {
                             // Optional loading UI
                             Text("Checking device activation...")
@@ -83,7 +86,7 @@ class MainActivity : ComponentActivity() {
 
                         else -> {
                             val startDestination =
-                                if (isActivated.value == true) "activation" else "login"
+                                if (isActivated.value == false) "activation" else "login"
 
                             NavHost(navController, startDestination = startDestination) {
                                 composable("activation") {
@@ -133,7 +136,100 @@ class MainActivity : ComponentActivity() {
                             }
 
                         }
+                    }*/
+                    val startDestination = when (isActivated.value) {
+                        null -> "activation" // If null (new installation), go to activation
+                        false -> "activation" // Not registered
+                        true -> "login" // Already registered
                     }
+                    NavHost(navController, startDestination = startDestination) {
+                        composable("activation") {
+                            ActivationScreen(
+                                onLoginSuccess = {
+                                    navController.navigate("login") {
+                                        popUpTo("activation") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("login") {
+                            LoginScreen(
+                                onThemeChange = { /* handle */ },
+                                onLanguageChange = { /* handle */ },
+                                onLoginSuccess = {
+                                    navController.navigate("home") {
+                                        popUpTo("login") { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
+                        composable("home") {
+                            PaymentEntryScreen(
+                                onViewTransaction = {
+                                    navController.navigate("transaction") {
+                                        popUpTo("transaction") { inclusive = false }
+                                    }
+                                }
+                            )
+                        }
+                        composable("transaction") {
+                            TransactionReportScreen()
+                        }
+                    }
+                    /*when (isActivated.value) {
+                        null -> {
+                            // Show loading or splash screen
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                                Text("Checking Registration...")
+                            }
+                        }
+                        else -> {
+                            val startDestination = when (isActivated.value) {
+                                false -> "activation"  // Not registered or new installation
+                                true -> "login"        // Already registered
+                                else -> "activation"   // Fallback
+                            }
+
+                            NavHost(navController, startDestination = startDestination) {
+                                composable("activation") {
+                                    ActivationScreen(
+                                        onLoginSuccess = {
+                                            navController.navigate("login") {
+                                                popUpTo("activation") { inclusive = true }
+                                            }
+                                        }
+                                    )
+                                }
+                                composable("login") {
+                                    LoginScreen(
+                                        onThemeChange = { *//* handle *//* },
+                                        onLanguageChange = { *//* handle *//* },
+                                        onLoginSuccess = {
+                                            navController.navigate("home") {
+                                                popUpTo("login") { inclusive = true }
+                                            }
+                                        }
+                                    )
+                                }
+                                composable("home") {
+                                    PaymentEntryScreen(
+                                        onViewTransaction = {
+                                            navController.navigate("transaction") {
+                                                popUpTo("transaction") { inclusive = false }
+                                            }
+                                        }
+                                    )
+                                }
+                                composable("transaction") {
+                                    TransactionReportScreen()
+                                }
+                            }
+                        }
+                    }*/
                     GlobalLoadingOverlay(loadingManager)
                 }
             }

@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.size.Size
 import com.retailetics.ezycollect.R
 import com.retailetics.ezycollect.data.remote.dto.Item
 
@@ -450,31 +451,33 @@ fun PaymentEntryScreen(
                             fontWeight = FontWeight.Bold
                         )
 
-                        Row {
-                            // ❌ Cancel Button (Red)
-                            Button(
-                                onClick = { showCartDialog = false },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Red
-                                ),
-                                modifier = Modifier.padding(end = 8.dp)
-                            ) {
-                                Text("Cancel", color = Color.White)
-                            }
 
-                            // ✅ Pay Now Button (Green)
-                            Button(
-                                onClick = {
-                                    // Handle Pay Now click
-                                    showCartDialog = false
-                                    showQrDialog.value=true
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF4CAF50) // Green
-                                )
-                            ) {
-                                Text("Pay Now", color = Color.White)
-                            }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        // ❌ Cancel Button (Red)
+                        Button(
+                            onClick = { showCartDialog = false },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red
+                            ),
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text("Cancel", color = Color.White)
+                        }
+
+                        // ✅ Pay Now Button (Green)
+                        Button(
+                            onClick = {
+                                // Handle Pay Now click
+                                showCartDialog = false
+                                showQrDialog.value=true
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4CAF50) // Green
+                            )
+                        ) {
+                            Text("Pay Now", color = Color.White)
                         }
                     }
                 }

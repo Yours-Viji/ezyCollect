@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -131,14 +133,16 @@ fun ActivationScreen(
             )
         },
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(5.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp)
-        ) {
-            OutlinedTextField(
+        ){
+        OutlinedTextField(
                 value = state.fullName,
                 onValueChange = viewModel::onNameChange,
                 label = { Text("Full Name") },
@@ -250,6 +254,31 @@ fun ActivationScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Submit")
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "(OR)",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = "Already Registered?",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Button(
+                onClick = {
+                    onLoginSuccess()
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.colorGreen),
+                    contentColor = Color.White
+                ),
+            ) {
+                Text("Login")
             }
         }
     }
