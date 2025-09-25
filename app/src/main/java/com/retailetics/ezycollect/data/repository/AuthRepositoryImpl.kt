@@ -3,19 +3,12 @@ package com.retailetics.ezycollect.data.repository
 import com.retailetics.ezycollect.data.datastore.PreferencesManager
 import com.retailetics.ezycollect.data.remote.api.AuthApi
 import com.retailetics.ezycollect.data.remote.dto.*
-import com.retailetics.ezycollect.domain.model.User
 import com.retailetics.ezycollect.domain.repository.AuthRepository
-import com.retailetics.ezycollect.model.CartActivationRequest
-import com.retailetics.ezycollect.model.CartActivationResponse
-import com.retailetics.ezycollect.model.EmployeeLoginRequest
-import com.retailetics.ezycollect.model.EmployeeLoginResponse
-import com.retailetics.ezycollect.model.ProductInfo
-import com.retailetics.ezycollect.model.ProductPriceInfo
+
 import com.retailetics.ezycollect.presentation.common.data.Constants
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -51,31 +44,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDeviceDetails(deviceId: String): NetworkResponse<DeviceDetailsResponse> {
-        return safeApiCallRaw { authApi.getDeviceDetails(deviceId) }
-            .also { result ->
-                if (result is NetworkResponse.Success) {
-                    preferencesManager.setDeviceActivated()
-                }
-            }
-    }
 
-    override suspend fun getProductDetails(barCode: String): NetworkResponse<ProductInfo> {
-        return safeApiCallRaw { authApi.searchProductInfo(barCode,getMerchantParam()) }
-            .also { result ->
-                if (result is NetworkResponse.Success) {
-                }
-            }
-    }
-
-
-    override suspend fun getPriceDetails(barCode: String): NetworkResponse<ProductPriceInfo> {
-        return safeApiCallRaw { authApi.searchPriceInfo(barCode,getMerchantParam()) }
-            .also { result ->
-                if (result is NetworkResponse.Success) {
-                }
-            }
-    }
 
     override suspend fun createNewShoppingCart(): NetworkResponse<CreateCartResponse> {
         return safeApiCallRaw { authApi.createShoppingCart() }
@@ -94,13 +63,7 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
     }
-    override suspend fun getPaymentSummary(): NetworkResponse<ShoppingCartDetails> {
-        return safeApiCallRaw { authApi.getPaymentSummary(preferencesManager.getShoppingCartId()) }
-            .also { result ->
-                if (result is NetworkResponse.Success) {
-                }
-            }
-    }
+
     override suspend fun addProductToShoppingCart(name: String,quantity:Int,price:Double): NetworkResponse<ShoppingCartDetails> {
         return safeApiCallRaw { authApi.addProductToCartApi(AddProductToCartRequest(name,quantity,price)) }
             .also { result ->

@@ -21,7 +21,4 @@ class LoginUseCase @Inject constructor(
         return authRepository.registration(fullName, shopName,phone,email,address,bankAccount,bankName,password,loginPin,biometricEnabled,termsAccepted)
     }
 
-    suspend  fun deviceDetails(deviceId: String): NetworkResponse<DeviceDetailsResponse> {
-        return authRepository.getDeviceDetails(deviceId)
-    }
 }
