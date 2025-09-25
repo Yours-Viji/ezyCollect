@@ -4,7 +4,6 @@ package com.retailetics.ezycollect.presentation.activation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.retailetics.ezycollect.data.datastore.PreferencesManager
-import com.retailetics.ezycollect.data.remote.dto.DeviceDetailsResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.domain.model.AppMode
 import com.retailetics.ezycollect.domain.usecase.GetAuthDataUseCase

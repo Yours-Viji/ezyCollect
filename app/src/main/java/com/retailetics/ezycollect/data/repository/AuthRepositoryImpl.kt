@@ -26,6 +26,7 @@ class AuthRepositoryImpl @Inject constructor(
             .also { result ->
                 if (result is NetworkResponse.Success) {
                     preferencesManager.saveAuthToken(result.data.token)
+                    preferencesManager.saveEmployeeDetails(result.data)
 
                 }
             }

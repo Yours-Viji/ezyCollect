@@ -9,8 +9,8 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.retailetics.ezycollect.data.datastore.model.UserPreferences
+import com.retailetics.ezycollect.data.remote.dto.LoginResponse
 import com.retailetics.ezycollect.domain.model.AppMode
-import com.retailetics.ezycollect.model.EmployeeLoginResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,13 +35,9 @@ class PreferencesManager @Inject constructor(
         private val X_AUTH_TOKEN = stringPreferencesKey("x_auth_token")
         private val ALLOW_EZY_LITE = booleanPreferencesKey("allowEzycartLite")
         private val EMPLOYEE_EMAIL = stringPreferencesKey("email")
-        private val EMPLOYEE_DEPARTMENT = stringPreferencesKey("employeeDepartment")
         private val EMPLOYEE_PIN = stringPreferencesKey("employeePin")
         private val EMPLOYEE_NAME = stringPreferencesKey("employeeName")
-        private val EMPLOYEE_POSITION = stringPreferencesKey("employeePosition")
-        private val EMPLOYEE_TYPE = stringPreferencesKey("employeeType")
-        private val EMPLOYEE_ID = intPreferencesKey("id")
-        private val EMPLOYEE_STATUS = intPreferencesKey("status")
+        private val BIOMETRIC_ENABLED = intPreferencesKey("biometricEnabled")
     }
 
     val userPreferencesFlow: Flow<UserPreferences> = dataStore.data
@@ -56,27 +52,21 @@ class PreferencesManager @Inject constructor(
             UserPreferences(
                 allowEzyCartLite = preferences[ALLOW_EZY_LITE] ?: false,
                 employeeEmail = preferences[EMPLOYEE_EMAIL] ?: "",
-                employeeDepartment = preferences[EMPLOYEE_DEPARTMENT] ?: "",
                 xAuthToken = preferences[X_AUTH_TOKEN] ?: "",
                 employeePin = preferences[EMPLOYEE_PIN] ?: "",
                 employeeName = preferences[EMPLOYEE_NAME] ?: "",
-                employeePosition = preferences[EMPLOYEE_POSITION] ?: "",
-                employeeType = preferences[EMPLOYEE_TYPE] ?: "",
-                employeeId = preferences[EMPLOYEE_ID] ?: 0,
-                employeeStatus = preferences[EMPLOYEE_STATUS] ?: 0,
+
             )
         }
-    suspend fun saveEmployeeDetails(data: EmployeeLoginResponse) {
+    suspend fun saveEmployeeDetails(data: LoginResponse) {
         dataStore.edit { preferences ->
-            preferences[EMPLOYEE_EMAIL] = data.email
-            preferences[EMPLOYEE_DEPARTMENT] = data.employeeDepartment
+            preferences[EMPLOYEE_EMAIL] = data.merchant.email
             preferences[X_AUTH_TOKEN] = data.token
-            preferences[EMPLOYEE_PIN] = data.employeePin
-            preferences[EMPLOYEE_NAME] = data.employeeName
-            preferences[EMPLOYEE_POSITION] = data.employeePosition
-            preferences[EMPLOYEE_TYPE] = data.employeeType
-            preferences[EMPLOYEE_ID] = data.id
-            preferences[EMPLOYEE_STATUS] = data.status
+            preferences[AUTH_TOKEN] = data.token
+            preferences[EMPLOYEE_PIN] = data.merchant.login_pin
+            preferences[EMPLOYEE_NAME] = data.merchant.full_name
+            preferences[MERCHANT_ID] = "${data.merchant.id}"
+            preferences[BIOMETRIC_ENABLED] = data.merchant.biometric_enabled
         }
           saveXAuthToken(data.token)
     }
@@ -163,14 +153,9 @@ class PreferencesManager @Inject constructor(
         dataStore.edit { preferences ->
 
             preferences.remove(EMPLOYEE_EMAIL)
-            preferences.remove(EMPLOYEE_DEPARTMENT)
             preferences.remove(X_AUTH_TOKEN)
             preferences.remove(EMPLOYEE_PIN)
             preferences.remove(EMPLOYEE_NAME)
-            preferences.remove(EMPLOYEE_POSITION)
-            preferences.remove(EMPLOYEE_TYPE)
-            preferences.remove(EMPLOYEE_ID)
-            preferences.remove(EMPLOYEE_STATUS)
             preferences.remove(SHOPPING_CART_ID)
             preferences.remove(AUTH_TOKEN)
         }

@@ -1,13 +1,10 @@
 package com.retailetics.ezycollect.domain.usecase
 
-import com.retailetics.ezycollect.data.remote.dto.DeviceDetailsResponse
 import com.retailetics.ezycollect.data.remote.dto.LoginResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.data.remote.dto.RegistrationResult
-import com.retailetics.ezycollect.domain.model.User
 import com.retailetics.ezycollect.domain.repository.AuthRepository
-import com.retailetics.ezycollect.model.CartActivationResponse
-import com.retailetics.ezycollect.model.EmployeeLoginResponse
+
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(
