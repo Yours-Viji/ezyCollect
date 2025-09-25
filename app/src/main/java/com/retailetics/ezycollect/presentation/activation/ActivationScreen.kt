@@ -90,19 +90,19 @@ fun ActivationScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
 
 
-    val isActivated = viewModel.isDeviceActivated.collectAsState()
+    /*val isActivated = viewModel.isDeviceActivated.collectAsState()
     LaunchedEffect(isActivated.value) {
         if (isActivated.value == false) {
           //  viewModel.getDeviceInfo()
         }
-    }
+    }*/
 
     LaunchedEffect(state.isActivationSuccessful) {
         if (state.isActivationSuccessful) {
             onLoginSuccess()
         }
     }
-    var fullName = remember { mutableStateOf("") }
+   /* var fullName = remember { mutableStateOf("") }
     var phone = remember { mutableStateOf("") }
     var email = remember { mutableStateOf("") }
     var address = remember { mutableStateOf("") }
@@ -112,7 +112,7 @@ fun ActivationScreen(
 
     var checked = remember { mutableStateOf(false) }
 
-    var selectedLoanType = remember { mutableStateOf("Personal") }
+    var selectedLoanType = remember { mutableStateOf("Personal") }*/
     var showOTPDialog = remember { mutableStateOf(false) }
 
     Scaffold(
@@ -139,14 +139,14 @@ fun ActivationScreen(
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             OutlinedTextField(
-                value = fullName.value,
-                onValueChange = { fullName.value = it },
+                value = state.fullName,
+                onValueChange = viewModel::onNameChange,
                 label = { Text("Full Name") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = shopName.value,
-                onValueChange = { shopName.value = it },
+                value = state.shopName,
+                onValueChange = viewModel::onShopNameChange,
                 label = { Text("Company / Shop Name") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -159,37 +159,37 @@ fun ActivationScreen(
             )*/
 
             OutlinedTextField(
-                value = phone.value,
-                onValueChange = { phone.value = it },
+                value = state.phone,
+                onValueChange = viewModel::onPhoneChange,
                 label = { Text("Phone Number") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = email.value,
-                onValueChange = { email.value = it },
+                value = state.email,
+                onValueChange = viewModel::onEmailChange,
                 label = { Text("Email Address") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedTextField(
-                value = address.value,
-                onValueChange = { address.value = it },
+                value = state.address,
+                onValueChange = viewModel::onAddressChange,
                 label = { Text("Address") },
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = bankAccount.value,
-                onValueChange = { bankAccount.value = it },
+                value = state.bankAccount,
+                onValueChange = viewModel::onBankAccountChange,
                 label = { Text("Bank Account") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = bankName.value,
-                onValueChange = { bankName.value = it },
+                value = state.bankName,
+                onValueChange = viewModel::onBankNameChange,
                 label = { Text("Bank Name") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -198,13 +198,24 @@ fun ActivationScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                listOf("Enable", "Not Now").forEach { type ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                val options = listOf(
+                    true to "Enable",
+                    false to "Not Now"
+                )
+
+                options.forEach { (value, text) ->
+                    Row(
+                        modifier = Modifier.clickable { viewModel.onBiometricEnabledChange(value) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         RadioButton(
-                            selected = selectedLoanType.value == type,
-                            onClick = { selectedLoanType.value = type }
+                            selected = state.biometricEnabled == value,
+                            onClick = { viewModel.onBiometricEnabledChange(value) }
                         )
-                        Text(type)
+                        Text(
+                            text = text,
+                            modifier = Modifier.clickable { viewModel.onBiometricEnabledChange(value) }
+                        )
                     }
                 }
             }
@@ -216,8 +227,8 @@ fun ActivationScreen(
                 modifier = Modifier.padding(8.dp)
             ) {
                 Checkbox(
-                    checked = checked.value,
-                    onCheckedChange = { checked.value = it }
+                    checked = state.termsAccepted,
+                    onCheckedChange = viewModel::onTermsAcceptedChange
                 )
 
                 Text(
@@ -232,7 +243,10 @@ fun ActivationScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
-                onClick = { showOTPDialog.value = true},
+                onClick = {
+                    viewModel.activateDevice()
+                   // showOTPDialog.value = true
+                          },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text("Submit")
@@ -244,7 +258,7 @@ fun ActivationScreen(
             onDismiss = { showOTPDialog.value = false },
             onVerify = { otp ->
                 // Handle OTP verification
-                viewModel.activateDeviceForTesting()
+                //viewModel.activateDeviceForTesting()
                 println("Entered OTP: $otp")
                 showOTPDialog.value = false
             }

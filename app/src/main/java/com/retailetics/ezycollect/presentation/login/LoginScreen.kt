@@ -121,14 +121,14 @@ fun LoginScreen(
             )
 
 
-            Spacer(modifier = Modifier.height(20.dp))
+            /*Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(
                 value = state.pin,
                 onValueChange = viewModel::onPinChange,
                 label = { Text("Login Pin") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
-            )
+            )*/
 
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -142,9 +142,9 @@ fun LoginScreen(
                             Toast.makeText(context  , "Please enter a valid Email Id", Toast.LENGTH_SHORT).show()
                         } else if (state.password.isEmpty()) {
                             Toast.makeText(context  , "Please enter a valid Password", Toast.LENGTH_SHORT).show()
-                        }else if (state.pin.isEmpty()) {
+                        }/*else if (state.pin.isEmpty()) {
                             Toast.makeText(context  , "Please enter a valid Login Pin", Toast.LENGTH_SHORT).show()
-                        }else {
+                        }*/else {
                             viewModel.login()
                         }
                         //showOTPDialog.value = true

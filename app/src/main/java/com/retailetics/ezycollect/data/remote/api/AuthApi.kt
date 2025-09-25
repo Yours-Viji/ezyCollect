@@ -31,7 +31,7 @@ interface AuthApi {
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
     @POST("/auth/register")
-    suspend fun registration(@Body registrationRequest: RegistrationRequest): Response<ApiResponse<RegistrationResult>>
+    suspend fun registration(@Body registrationRequest: RegistrationRequest): Response<RegistrationResult>
 
     @POST("/cart")
     suspend fun createShoppingCart(): Response<CreateCartResponse>

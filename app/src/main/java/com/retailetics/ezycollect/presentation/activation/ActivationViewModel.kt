@@ -97,11 +97,11 @@ class ActivationViewModel @Inject constructor(
     fun onErrorShown() {
         _stateFlow.value = _stateFlow.value.copy(error = null)
     }
-    fun activateDeviceForTesting(){
+    /*fun activateDeviceForTesting(){
         CoroutineScope(Dispatchers.IO).launch {
             preferencesManager.setDeviceActivated()
         }
-    }
+    }*/
     fun activateDevice() {
         loadingManager.show()
         viewModelScope.launch {
@@ -125,7 +125,8 @@ class ActivationViewModel @Inject constructor(
                         isLoading = false,
                         isActivationSuccessful = true
                     )
-                    //saveActivationDetails("${result.data.id}", "${result.data.merchantId}")
+                    preferencesManager.setDeviceActivated()
+                    saveActivationDetails("${result.data.merchantId}", "${result.data.merchantId}")
                     loadingManager.hide()
                 }
                 is NetworkResponse.Error -> {
@@ -134,9 +135,9 @@ class ActivationViewModel @Inject constructor(
                         error = result.message ?: "Activation failed",
                         isActivationSuccessful = false
                     )
-                    if(result.message.contains("Error: Already a device activated with same device Id")){
+                    /*if(result.message.contains("Error: Already a device activated with same device Id")){
                        // getDeviceInfo()
-                    }
+                    }*/
                     loadingManager.hide()
                 }
             }

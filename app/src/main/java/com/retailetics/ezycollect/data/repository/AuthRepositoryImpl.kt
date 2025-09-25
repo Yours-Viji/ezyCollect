@@ -32,9 +32,19 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun registration(fullName: String, shopName: String, phone: String, email: String, address: String, bankAccount: String,bankName: String, password: String, loginPin: String, biometricEnabled: Boolean, termsAccepted: Boolean
+    ): NetworkResponse<RegistrationResult> {
+        return safeApiCallRaw { authApi.registration(RegistrationRequest(address = address, bankAccount = bankAccount, bankName = bankName,biometricEnabled = biometricEnabled, termsAccepted = termsAccepted,
+            fullName = fullName, shopName = shopName, phone = phone, email = email, loginPin = loginPin, password = password)) }
+            .also { result ->
+                if (result is NetworkResponse.Success) {
+                    preferencesManager.setDeviceActivated()
 
+                }
+            }
+    }
 
-    override suspend fun registration(
+  /*  override suspend fun registration(
         fullName: String, shopName: String, phone: String, email: String, address: String, bankAccount: String,bankName: String, password: String, loginPin: String, biometricEnabled: Boolean, termsAccepted: Boolean
     ): NetworkResponse<RegistrationResult> {
         return safeApiCall {
@@ -45,7 +55,7 @@ class AuthRepositoryImpl @Inject constructor(
                 preferencesManager.setDeviceActivated()
             }
         }
-    }
+    }*/
 
 
 

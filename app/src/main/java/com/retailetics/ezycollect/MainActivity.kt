@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
 
                         else -> {
                             val startDestination =
-                                if (isActivated.value == true) "login" else "activation"
+                                if (isActivated.value == true) "activation" else "login"
 
                             NavHost(navController, startDestination = startDestination) {
                                 composable("activation") {
