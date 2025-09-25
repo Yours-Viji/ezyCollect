@@ -52,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -97,10 +98,17 @@ fun PaymentEntryScreen(
             onDismiss = { showQrDialog.value = false },
             onTapToPay = {
                 // Handle tap to pay logic
+                viewModel.checkout("Tap On Pay")
+                showQrDialog.value = false
             },
             onQrPayment = {
                 showQrDialog.value = false
                 showPaymentDialog.value=true
+                viewModel.checkout("QR Payment")
+            },
+            onCashPayment={
+                viewModel.checkout("Cash")
+                showQrDialog.value = false
             }
         )
     }
@@ -613,7 +621,9 @@ fun QrPaymentAlert(
 fun PaymentOptionDialog(
     onDismiss: () -> Unit,
     onTapToPay: () -> Unit,
-    onQrPayment: () -> Unit
+    onQrPayment: () -> Unit,
+    onCashPayment: () -> Unit
+
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
         Card(
@@ -673,6 +683,25 @@ fun PaymentOptionDialog(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text("QR Payment", color = Color.White)
+                }
+
+                Button(
+                    onClick = onCashPayment,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.colorOrange) // Green
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_money_24),
+                        contentDescription = "Cash",
+                        tint = Color.White,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Cash", color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

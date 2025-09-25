@@ -46,14 +46,6 @@ class HomeViewModel @Inject constructor(
     private val _shoppingCartInfo = MutableStateFlow<ShoppingCartDetails?>(null)
     val shoppingCartInfo: StateFlow<ShoppingCartDetails?> = _shoppingCartInfo.asStateFlow()
 
-
-
-    private val _isPickerModel = MutableStateFlow<Boolean>(false)
-    val isPickerModel: StateFlow<Boolean> = _isPickerModel.asStateFlow()
-
-    private val _appMode = MutableStateFlow(AppMode.EzyCartPicker)
-    val appMode: StateFlow<AppMode> = _appMode
-
     private val _employeeName = MutableStateFlow("")
     val employeeName: StateFlow<String> = _employeeName.asStateFlow()
 
@@ -66,26 +58,23 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val savedAppMode = preferencesManager.getAppMode()
-            _appMode.update { savedAppMode }
-            _isPickerModel.update { savedAppMode.name == AppMode.EzyCartPicker.name }
+
             _employeeName.update { preferencesManager.getEmployeeName() }
 
         }
 
     }
 
-    fun onAppModeChange(selectedAppMode:AppMode) {
-        viewModelScope.launch {
-            _isPickerModel.update {selectedAppMode.name == AppMode.EzyCartPicker.name}
-            preferencesManager.setAppMode(selectedAppMode)
-        }
-    }
     fun initNewShopping(){
         clearCartDetails()
         createNewShoppingCart()
     }
-   private fun clearCartDetails(){
-
+    private fun clearCartDetails() {
+        _stateFlow.value = HomeState()
+        _cartDataList.value = emptyList()
+        _cartCount.value = 0
+        _totalAmount.value = 0.0
+        _shoppingCartInfo.value = null
     }
     private fun createNewShoppingCart() {
         loadingManager.show()
@@ -212,7 +201,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+     fun checkout(paymentMethod:String) {
+        loadingManager.show()
+        clearCartDetails()
+        viewModelScope.launch {
+            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
 
+            when (val result = shoppingUseCase.checkout(preferencesManager.getMerchantId(),paymentMethod)) {
+                is NetworkResponse.Success -> {
+                    _stateFlow.value = _stateFlow.value.copy(
+                        isLoading = false,
+                    )
+                    initNewShopping()
+                    loadingManager.hide()
+                }
+                is NetworkResponse.Error -> {
+                    _stateFlow.value = _stateFlow.value.copy(
+                        isLoading = false,
+                        error = result.message ?: "Unable to store transaction",
+                    )
+                    loadingManager.hide()
+                }
+            }
+        }
+    }
 
 
 }

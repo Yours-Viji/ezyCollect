@@ -32,6 +32,8 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
+
+
     override suspend fun registration(
         fullName: String, shopName: String, phone: String, email: String, address: String, bankAccount: String,bankName: String, password: String, loginPin: String, biometricEnabled: Boolean, termsAccepted: Boolean
     ): NetworkResponse<RegistrationResult> {
@@ -85,6 +87,18 @@ class AuthRepositoryImpl @Inject constructor(
         return safeApiCallRaw { authApi.deleteProductFromCart(preferencesManager.getShoppingCartId(),id) }
             .also { result ->
                 if (result is NetworkResponse.Success) {
+                }
+            }
+    }
+
+    override suspend fun checkout(merchantId: String,paymentMethod: String): NetworkResponse<CheckoutResponse> {
+        return safeApiCallRaw { authApi.checkoutApi(CheckoutRequest(
+            merchantId.toInt(),
+            paymentMethod
+        )) }
+            .also { result ->
+                if (result is NetworkResponse.Success) {
+
                 }
             }
     }

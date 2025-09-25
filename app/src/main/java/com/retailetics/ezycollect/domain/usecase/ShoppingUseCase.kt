@@ -1,5 +1,6 @@
 package com.retailetics.ezycollect.domain.usecase
 
+import com.retailetics.ezycollect.data.remote.dto.CheckoutResponse
 import com.retailetics.ezycollect.data.remote.dto.CreateCartResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.data.remote.dto.ShoppingCartDetails
@@ -32,6 +33,8 @@ class ShoppingUseCase @Inject constructor(
     }
 
 
-
+    suspend  fun checkout(merchantId: String,paymentMethod: String): NetworkResponse<CheckoutResponse> {
+        return authRepository.checkout(merchantId,paymentMethod)
+    }
 
 }
