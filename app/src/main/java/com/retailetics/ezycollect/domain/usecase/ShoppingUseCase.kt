@@ -4,6 +4,7 @@ import com.retailetics.ezycollect.data.remote.dto.CheckoutResponse
 import com.retailetics.ezycollect.data.remote.dto.CreateCartResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.data.remote.dto.ShoppingCartDetails
+import com.retailetics.ezycollect.data.remote.dto.TransactionReportData
 import com.retailetics.ezycollect.domain.repository.AuthRepository
 
 
@@ -35,6 +36,10 @@ class ShoppingUseCase @Inject constructor(
 
     suspend  fun checkout(merchantId: String,paymentMethod: String): NetworkResponse<CheckoutResponse> {
         return authRepository.checkout(merchantId,paymentMethod)
+    }
+
+    suspend  fun getTransactionReport(startDate: String,endDate:String): NetworkResponse<TransactionReportData> {
+        return authRepository.getTransactionReport(startDate,endDate)
     }
 
 }

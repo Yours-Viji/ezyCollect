@@ -1,6 +1,7 @@
 package com.retailetics.ezycollect.data.remote.interceptors
 
 import com.retailetics.ezycollect.data.datastore.PreferencesManager
+import com.retailetics.ezycollect.domain.model.AppMode
 import com.retailetics.ezycollect.presentation.common.data.Constants
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -26,9 +27,7 @@ class AuthInterceptor @Inject constructor(
             preferencesManager.getXAuthToken()
         }
 
-        val appMode = runBlocking {
-            preferencesManager.getAppMode()
-        }
+
 
         val requestBuilder = originalRequest.newBuilder()
 
@@ -53,7 +52,7 @@ class AuthInterceptor @Inject constructor(
         requestBuilder.header(Constants.BUILD_NO, "01")
 
         requestBuilder.header("jwt-authorization", "Bearer ${Constants.jwtToken}")
-        requestBuilder.header("appMode", appMode.name)
+        requestBuilder.header("appMode", "ezyCollect")
         val request = requestBuilder.build()
         return chain.proceed(request)
     }

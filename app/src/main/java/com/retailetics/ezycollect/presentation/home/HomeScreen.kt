@@ -75,7 +75,8 @@ data class CartItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentEntryScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onViewTransaction: () -> Unit,
 ) {
     val cartDataList = viewModel.cartDataList.collectAsState()
     val totalAmount = viewModel.totalAmount.collectAsState()
@@ -126,12 +127,25 @@ fun PaymentEntryScreen(
                 title = { Text("Payment Entry") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White
-                )
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White // Optional: set icon color
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            onViewTransaction()
+                            println("Icon clicked!")
+                        }
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.outline_contract_24),
+                            contentDescription = "Settings"
+                        )
+                    }
+                }
             )
-        },
-
-    ) { innerPadding ->
+        }
+    ) {  innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -550,11 +564,11 @@ fun CartItemRow(
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun PaymentEntryScreenPreview() {
     PaymentEntryScreen()
-}
+}*/
 
 @Composable
 fun QrPaymentAlert(

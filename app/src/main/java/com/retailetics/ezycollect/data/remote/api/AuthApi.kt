@@ -23,6 +23,7 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 import retrofit2.http.Path
+import retrofit2.http.QueryMap
 
 
 interface AuthApi {
@@ -60,6 +61,6 @@ interface AuthApi {
     @POST("/cart/checkout")
     suspend fun checkoutApi(@Body checkoutRequest: CheckoutRequest): Response<CheckoutResponse>
 
-    @GET("/report/transaction")
-    suspend fun getTransactionReport(): Response<TransactionReportData>
+    @GET("/report/transactions")
+    suspend fun getTransactionReport(@QueryMap params: Map<String, String>): Response<TransactionReportData>
 }

@@ -103,34 +103,27 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
-    private suspend fun getMerchantParam(): HashMap<String, String> {
+    override suspend fun getTransactionReport(startDate: String,endDate:String): NetworkResponse<TransactionReportData> {
+        return safeApiCallRaw { authApi.getTransactionReport(getTransactionReportParam(
+            startDate,
+            endDate
+        )) }
+            .also { result ->
+                if (result is NetworkResponse.Success) {
+
+                }
+            }
+    }
+
+    private suspend fun getTransactionReportParam(startDate:String,endDate:String): HashMap<String, String> {
         val params = HashMap<String, String>()
-        params["merchantId"] = "" + preferencesManager.getMerchantId()
-        params["outletId"] = "" + preferencesManager.getOutletId()
-        params["isMemberLogin"] = "false"
+        params["merchantId"] = preferencesManager.getMerchantId()
+        params["startDate"] = startDate
+        params["endDate"] = endDate
 
         return params
     }
 
-
-        private suspend fun getCreateCartRequestData(): CreateCartRequest {
-            val prefs = preferencesManager.userPreferencesFlow.first()
-            val outletId = preferencesManager.getOutletId()
-            val merchantId = preferencesManager.getMerchantId()
-            val appMode = preferencesManager.getAppMode()
-
-            return CreateCartRequest(
-                employeeId = prefs.employeeId.toString(),
-                memberNumber = "",
-                userId = "",
-                name = prefs.employeeName,
-                deviceId = Constants.deviceId,
-                outletId = outletId,
-                merchantId = merchantId,
-                appMode = appMode.name,
-                trolleyNo = "01"
-            )
-        }
 
     override suspend fun saveAuthToken(token: String) {
         preferencesManager.saveAuthToken(token)
@@ -148,14 +141,6 @@ class AuthRepositoryImpl @Inject constructor(
         return preferencesManager.getCartId()
     }
 
-   /* private fun LoginResponse.toUser(): User {
-        return User(
-            id = id,
-            email = email,
-            name = name,
-            token = token
-        )
-    }*/
 
     /**
      * For APIs that return ApiResponse<T>.

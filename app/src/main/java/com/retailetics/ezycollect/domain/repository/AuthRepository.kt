@@ -6,6 +6,7 @@ import com.retailetics.ezycollect.data.remote.dto.LoginResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.data.remote.dto.RegistrationResult
 import com.retailetics.ezycollect.data.remote.dto.ShoppingCartDetails
+import com.retailetics.ezycollect.data.remote.dto.TransactionReportData
 
 import kotlinx.coroutines.flow.Flow
 
@@ -19,6 +20,7 @@ interface AuthRepository {
     suspend fun deleteProductFromShoppingCart(id:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun editProductInCart(id:Int,price:Double,quantity:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun checkout(merchantId: String,paymentMethod: String): NetworkResponse<CheckoutResponse>
+    suspend fun getTransactionReport(startDate: String,endDate:String): NetworkResponse<TransactionReportData>
     suspend fun saveAuthToken(token: String)
     suspend fun getAuthToken(): String?
     fun isDeviceActivated(): Flow<Boolean>

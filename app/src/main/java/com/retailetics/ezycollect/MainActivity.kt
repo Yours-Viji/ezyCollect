@@ -28,6 +28,7 @@ import com.meticha.permissions_compose.PermissionManagerConfig
 import com.retailetics.ezycollect.presentation.activation.ActivationScreen
 import com.retailetics.ezycollect.presentation.home.PaymentEntryScreen
 import com.retailetics.ezycollect.presentation.login.LoginScreen
+import com.retailetics.ezycollect.presentation.transaction.TransactionReportScreen
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
@@ -116,6 +117,16 @@ class MainActivity : ComponentActivity() {
                                 composable("home") {
 
                                     PaymentEntryScreen(
+                                        onViewTransaction = {
+                                            navController.navigate("transaction") {
+                                                popUpTo("transaction") { inclusive = false }
+                                            }
+                                        }
+                                    )
+                                }
+                                composable("transaction") {
+
+                                    TransactionReportScreen(
 
                                     )
                                 }
