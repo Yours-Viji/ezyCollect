@@ -5,8 +5,7 @@ import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 import com.retailetics.ezycollect.data.remote.dto.ShoppingCartDetails
 import com.retailetics.ezycollect.domain.repository.AuthRepository
 
-import com.retailetics.ezycollect.model.ProductInfo
-import com.retailetics.ezycollect.model.ProductPriceInfo
+
 import javax.inject.Inject
 
 class ShoppingUseCase @Inject constructor(
