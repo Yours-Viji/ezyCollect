@@ -93,19 +93,19 @@ fun TransactionReportScreen(
             // Filter Section
             Card(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(10.dp)
                     .fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(10.dp)
                 ) {
                     Text(
                         text = "Filter Transactions",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 10.dp)
                     )
 
                     // Date Range Row
@@ -148,7 +148,7 @@ fun TransactionReportScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Show error message if any
                     if (errorState.value.isNotEmpty()) {
@@ -167,7 +167,7 @@ fun TransactionReportScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
+                            .height(45.dp),
                         shape = MaterialTheme.shapes.large,
                         enabled = startDate.value.isNotEmpty() &&
                                 endDate.value.isNotEmpty() &&
@@ -199,7 +199,7 @@ fun TransactionReportScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(40.dp),
+                                .height(45.dp),
                             shape = MaterialTheme.shapes.large,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = colorResource(R.color.colorOrange)
@@ -232,14 +232,14 @@ fun TransactionReportScreen(
                         text = "Transactions (${transactionReport.value.size})",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
                     )
 
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
+                            .padding(horizontal = 10.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(transactionReport.value) { transaction ->
@@ -321,7 +321,7 @@ fun SummaryCard(totalCollection: Int, totalTransactions: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -329,7 +329,7 @@ fun SummaryCard(totalCollection: Int, totalTransactions: Int) {
         shape = MaterialTheme.shapes.large
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
             Text(
                 text = "Transaction Summary",
@@ -394,7 +394,7 @@ fun TransactionCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onCardClick() }
-                    .padding(16.dp),
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

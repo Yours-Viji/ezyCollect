@@ -150,7 +150,7 @@ fun PaymentEntryScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(10.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()) // Make the entire column scrollable
         ) {
@@ -185,7 +185,7 @@ fun PaymentEntryScreen(
                         singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
                         text = "Price",

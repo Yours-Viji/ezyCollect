@@ -197,6 +197,21 @@ fun ActivationScreen(
                 label = { Text("Bank Name") },
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(
+                value = state.password,
+                onValueChange = viewModel::onPasswordChange,
+                label = { Text("Password") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = state.loginPin,
+                onValueChange = viewModel::onPinChange,
+                label = { Text("Login Pin") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(10.dp))
             Text("Enable Biometric Login", style = MaterialTheme.typography.labelLarge)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -251,7 +266,7 @@ fun ActivationScreen(
                     viewModel.activateDevice()
                    // showOTPDialog.value = true
                           },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
             ) {
                 Text("Submit")
             }
@@ -272,7 +287,7 @@ fun ActivationScreen(
                 onClick = {
                     onLoginSuccess()
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.colorGreen),
                     contentColor = Color.White
