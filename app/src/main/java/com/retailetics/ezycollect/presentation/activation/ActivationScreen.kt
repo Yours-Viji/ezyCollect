@@ -34,6 +34,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +64,7 @@ import com.retailetics.ezycollect.domain.model.AppMode
 import com.meticha.permissions_compose.AppPermission
 import com.meticha.permissions_compose.rememberAppPermissionState
 import com.retailetics.ezycollect.R
-
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,46 +79,33 @@ fun ActivationScreen(
                 description = "Camera access is needed to take photos. Please grant this permission.",
                 isRequired = true
             ),
-            /* AppPermission(
-                 permission = Manifest.permission.RECORD_AUDIO,
-                 description = "Microphone access is needed for voice recording. Please grant this permission.",
-                 isRequired = false
-             ),
-             AppPermission(
-                 permission = Manifest.permission.READ_CONTACTS,
-                 description = "Contact access is needed to show the contacts in the App. Please grant this permission",
-                 isRequired = true
-             ),*/
         )
     )
 
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-
-    /*val isActivated = viewModel.isDeviceActivated.collectAsState()
-    LaunchedEffect(isActivated.value) {
-        if (isActivated.value == false) {
-          //  viewModel.getDeviceInfo()
-        }
-    }*/
+    // Track validation errors
+    val validationErrors = remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
     LaunchedEffect(state.isActivationSuccessful) {
         if (state.isActivationSuccessful) {
             onLoginSuccess()
         }
     }
-   /* var fullName = remember { mutableStateOf("") }
-    var phone = remember { mutableStateOf("") }
-    var email = remember { mutableStateOf("") }
-    var address = remember { mutableStateOf("") }
-    var bankAccount = remember { mutableStateOf("") }
-    var bankName = remember { mutableStateOf("") }
-    var shopName = remember { mutableStateOf("") }
 
-    var checked = remember { mutableStateOf(false) }
-
-    var selectedLoanType = remember { mutableStateOf("Personal") }*/
     var showOTPDialog = remember { mutableStateOf(false) }
+
+    // Show validation errors when they occur
+    LaunchedEffect(validationErrors.value) {
+        if (validationErrors.value.isNotEmpty()) {
+            val firstError = validationErrors.value.values.firstOrNull()
+            firstError?.let { errorMessage ->
+                snackbarHostState.showSnackbar(errorMessage)
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -132,6 +122,7 @@ fun ActivationScreen(
                 )
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
 
         Column(
@@ -141,76 +132,184 @@ fun ActivationScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(5.dp)
-        ){
-        OutlinedTextField(
+        ) {
+            // Full Name Field with validation
+            OutlinedTextField(
                 value = state.fullName,
-                onValueChange = viewModel::onNameChange,
+                onValueChange = {
+                    viewModel.onNameChange(it)
+                    // Clear validation error when user starts typing
+                    if (validationErrors.value.containsKey("fullName")) {
+                        validationErrors.value = validationErrors.value - "fullName"
+                    }
+                },
                 label = { Text("Full Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("fullName"),
+                supportingText = {
+                    validationErrors.value["fullName"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
+            // Shop Name Field with validation
             OutlinedTextField(
                 value = state.shopName,
-                onValueChange = viewModel::onShopNameChange,
+                onValueChange = {
+                    viewModel.onShopNameChange(it)
+                    if (validationErrors.value.containsKey("shopName")) {
+                        validationErrors.value = validationErrors.value - "shopName"
+                    }
+                },
                 label = { Text("Company / Shop Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("shopName"),
+                supportingText = {
+                    validationErrors.value["shopName"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
-           /* OutlinedTextField(
-                value = dob.value,
-                onValueChange = { dob.value = it },
-                label = { Text("Date of Birth") },
-                placeholder = { Text("dd/mm/yyyy") },
-                modifier = Modifier.fillMaxWidth()
-            )*/
 
+            // Phone Field with validation
             OutlinedTextField(
                 value = state.phone,
-                onValueChange = viewModel::onPhoneChange,
+                onValueChange = {
+                    viewModel.onPhoneChange(it)
+                    if (validationErrors.value.containsKey("phone")) {
+                        validationErrors.value = validationErrors.value - "phone"
+                    }
+                },
                 label = { Text("Phone Number") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("phone"),
+                supportingText = {
+                    validationErrors.value["phone"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
 
+            // Email Field with validation
             OutlinedTextField(
                 value = state.email,
-                onValueChange = viewModel::onEmailChange,
+                onValueChange = {
+                    viewModel.onEmailChange(it)
+                    if (validationErrors.value.containsKey("email")) {
+                        validationErrors.value = validationErrors.value - "email"
+                    }
+                },
                 label = { Text("Email Address") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("email"),
+                supportingText = {
+                    validationErrors.value["email"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
 
+            // Address Field with validation
             OutlinedTextField(
                 value = state.address,
-                onValueChange = viewModel::onAddressChange,
+                onValueChange = {
+                    viewModel.onAddressChange(it)
+                    if (validationErrors.value.containsKey("address")) {
+                        validationErrors.value = validationErrors.value - "address"
+                    }
+                },
                 label = { Text("Address") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("address"),
+                supportingText = {
+                    validationErrors.value["address"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
+            // Bank Account Field with validation
             OutlinedTextField(
                 value = state.bankAccount,
-                onValueChange = viewModel::onBankAccountChange,
+                onValueChange = {
+                    viewModel.onBankAccountChange(it)
+                    if (validationErrors.value.containsKey("bankAccount")) {
+                        validationErrors.value = validationErrors.value - "bankAccount"
+                    }
+                },
                 label = { Text("Bank Account") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("bankAccount"),
+                supportingText = {
+                    validationErrors.value["bankAccount"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
+            // Bank Name Field with validation
             OutlinedTextField(
                 value = state.bankName,
-                onValueChange = viewModel::onBankNameChange,
+                onValueChange = {
+                    viewModel.onBankNameChange(it)
+                    if (validationErrors.value.containsKey("bankName")) {
+                        validationErrors.value = validationErrors.value - "bankName"
+                    }
+                },
                 label = { Text("Bank Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("bankName"),
+                supportingText = {
+                    validationErrors.value["bankName"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
+            // Password Field with validation
             OutlinedTextField(
                 value = state.password,
-                onValueChange = viewModel::onPasswordChange,
+                onValueChange = {
+                    viewModel.onPasswordChange(it)
+                    if (validationErrors.value.containsKey("password")) {
+                        validationErrors.value = validationErrors.value - "password"
+                    }
+                },
                 label = { Text("Password") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("password"),
+                supportingText = {
+                    validationErrors.value["password"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
+            // Login Pin Field with validation
             OutlinedTextField(
                 value = state.loginPin,
-                onValueChange = viewModel::onPinChange,
+                onValueChange = {
+                    viewModel.onPinChange(it)
+                    if (validationErrors.value.containsKey("loginPin")) {
+                        validationErrors.value = validationErrors.value - "loginPin"
+                    }
+                },
                 label = { Text("Login Pin") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = validationErrors.value.containsKey("loginPin"),
+                supportingText = {
+                    validationErrors.value["loginPin"]?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    }
+                }
             )
+
             Spacer(Modifier.height(10.dp))
             Text("Enable Biometric Login", style = MaterialTheme.typography.labelLarge)
             Row(
@@ -239,33 +338,44 @@ fun ActivationScreen(
                 }
             }
 
-
-
+            // Terms Checkbox with validation
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(8.dp)
             ) {
                 Checkbox(
                     checked = state.termsAccepted,
-                    onCheckedChange = viewModel::onTermsAcceptedChange
+                    onCheckedChange = {
+                        viewModel.onTermsAcceptedChange(it)
+                        if (validationErrors.value.containsKey("termsAccepted")) {
+                            validationErrors.value = validationErrors.value - "termsAccepted"
+                        }
+                    },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = if (validationErrors.value.containsKey("termsAccepted")) Color.Red else colorResource(id = R.color.colorPrimary)
+                    )
                 )
 
                 Text(
                     text = "I hereby confirm that the provided information is accurate and request to process my registration.",
                     fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp)
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = if (validationErrors.value.containsKey("termsAccepted")) Color.Red else Color.Unspecified
                 )
             }
-
-
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
                 onClick = {
-                    viewModel.activateDevice()
-                   // showOTPDialog.value = true
-                          },
+                    // Perform validation before activating device
+                    val errors = validateFields(state)
+                    if (errors.isEmpty()) {
+                        viewModel.activateDevice()
+                    } else {
+                        validationErrors.value = errors
+                    }
+                },
                 modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
             ) {
                 Text("Submit")
@@ -297,19 +407,92 @@ fun ActivationScreen(
             }
         }
     }
+
     if (showOTPDialog.value) {
         OtpVerificationDialog(
             onDismiss = { showOTPDialog.value = false },
             onVerify = { otp ->
                 // Handle OTP verification
-                //viewModel.activateDeviceForTesting()
                 println("Entered OTP: $otp")
                 showOTPDialog.value = false
             }
         )
     }
+}
 
+/**
+ * Validation function that checks all required fields
+ */
+private fun validateFields(state: ActivationState): Map<String, String> {
+    val errors = mutableMapOf<String, String>()
 
+    // Check all fields are non-empty
+    if (state.fullName.isBlank()) {
+        errors["fullName"] = "Full name is required"
+    }
+
+    if (state.shopName.isBlank()) {
+        errors["shopName"] = "Shop/Company name is required"
+    }
+
+    if (state.phone.isBlank()) {
+        errors["phone"] = "Phone number is required"
+    } else if (!isValidPhone(state.phone)) {
+        errors["phone"] = "Please enter a valid phone number"
+    }
+
+    if (state.email.isBlank()) {
+        errors["email"] = "Email address is required"
+    } else if (!isValidEmail(state.email)) {
+        errors["email"] = "Please enter a valid email address"
+    }
+
+    if (state.address.isBlank()) {
+        errors["address"] = "Address is required"
+    }
+
+    if (state.bankAccount.isBlank()) {
+        errors["bankAccount"] = "Bank account is required"
+    }
+
+    if (state.bankName.isBlank()) {
+        errors["bankName"] = "Bank name is required"
+    }
+
+    if (state.password.isBlank()) {
+        errors["password"] = "Password is required"
+    } else if (state.password.length < 6) {
+        errors["password"] = "Password must be at least 6 characters"
+    }
+
+    if (state.loginPin.isBlank()) {
+        errors["loginPin"] = "Login PIN is required"
+    } else if (state.loginPin.length != 6) {
+        errors["loginPin"] = "PIN must be 6 digits"
+    }
+
+    if (!state.termsAccepted) {
+        errors["termsAccepted"] = "You must accept the terms and conditions"
+    }
+
+    return errors
+}
+
+/**
+ * Simple email validation
+ */
+private fun isValidEmail(email: String): Boolean {
+    val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
+    return email.matches(emailRegex.toRegex())
+}
+
+/**
+ * Simple phone validation (adjust based on your requirements)
+ */
+private fun isValidPhone(phone: String): Boolean {
+    // Basic validation - at least 10 digits, you can customize this
+    val phoneRegex = "^[0-9]{10,}$"
+    return phone.replace("\\s".toRegex(), "").matches(phoneRegex.toRegex())
 }
 
 @Composable
@@ -365,8 +548,3 @@ fun OtpVerificationDialog(
         shape = RoundedCornerShape(16.dp)
     )
 }
-
-
-
-
-
