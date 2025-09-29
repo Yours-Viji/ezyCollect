@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -68,6 +69,13 @@ fun LoginScreen(
     LaunchedEffect(state.isLoginSuccessful) {
         if (state.isLoginSuccessful) {
             onLoginSuccess()
+        }
+    }
+    LaunchedEffect(state.error) {
+        state.error?.let { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            // Optional: Clear the error after showing
+            // viewModel.clearError()
         }
     }
     Scaffold(
