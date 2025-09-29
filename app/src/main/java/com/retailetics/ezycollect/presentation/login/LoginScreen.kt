@@ -208,7 +208,7 @@ fun LoginScreen(
         OtpVerificationDialog(
             onDismiss = { showOTPDialog.value = false },
             onVerify = { otp ->
-viewModel.testLogin()
+//viewModel.testLogin()
                 println("Entered OTP: $otp")
                 showOTPDialog.value = false
             }

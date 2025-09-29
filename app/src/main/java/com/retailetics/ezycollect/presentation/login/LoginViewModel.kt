@@ -32,6 +32,7 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
     private val _stateFlow = MutableStateFlow(LoginState())
     val stateFlow: StateFlow<LoginState> = _stateFlow.asStateFlow()
+
     val userPreferences: StateFlow<UserPreferences> =
         preferencesManager.userPreferencesFlow
             .stateIn(
@@ -39,6 +40,7 @@ class LoginViewModel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5000),
                 initialValue = UserPreferences()
             )
+
     val authState = getAuthDataUseCase()
         .stateIn(
             scope = viewModelScope,
@@ -49,11 +51,18 @@ class LoginViewModel @Inject constructor(
     fun onPinChange(pin: String) {
         _stateFlow.value = _stateFlow.value.copy(pin = pin)
     }
+
     fun onPasswordChange(password: String) {
         _stateFlow.value = _stateFlow.value.copy(password = password)
     }
+
     fun onEmailChange(email: String) {
         _stateFlow.value = _stateFlow.value.copy(email = email)
+    }
+
+    // Add method to clear error
+    fun clearError() {
+        _stateFlow.value = _stateFlow.value.copy(error = null)
     }
 
     fun testLogin(){
@@ -62,30 +71,44 @@ class LoginViewModel @Inject constructor(
             isLoginSuccessful = true
         )
     }
-    fun login(pin: String = _stateFlow.value.pin,email: String=_stateFlow.value.email,password:String=_stateFlow.value.password) {
-        loadingManager.show()
-        viewModelScope.launch {
-            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
 
-            when (val result = loginUseCase(email,password,"")) {
-                is NetworkResponse.Success -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        isLoginSuccessful = true
-                    )
-                    loadingManager.hide()
+    fun login(pin: String = _stateFlow.value.pin, email: String = _stateFlow.value.email, password: String = _stateFlow.value.password) {
+        // Reset error state first
+        _stateFlow.value = _stateFlow.value.copy(
+            isLoading = true,
+            error = null,
+            isLoginSuccessful = false
+        )
+
+        loadingManager.show()
+
+        viewModelScope.launch {
+            try {
+                when (val result = loginUseCase(email, password, pin)) {
+                    is NetworkResponse.Success -> {
+                        _stateFlow.value = _stateFlow.value.copy(
+                            isLoading = false,
+                            isLoginSuccessful = true,
+                            error = null
+                        )
+                    }
+                    is NetworkResponse.Error -> {
+                        _stateFlow.value = _stateFlow.value.copy(
+                            isLoading = false,
+                            error = result.message,
+                            isLoginSuccessful = false
+                        )
+                    }
                 }
-                is NetworkResponse.Error -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        error = result.message,
-                        isLoginSuccessful = false
-                    )
-                    loadingManager.hide()
-                }
+            } catch (e: Exception) {
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false,
+                    error = "Network error: ${e.message}",
+                    isLoginSuccessful = false
+                )
+            } finally {
+                loadingManager.hide()
             }
         }
     }
-
-
 }
