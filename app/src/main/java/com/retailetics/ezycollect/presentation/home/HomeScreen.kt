@@ -106,7 +106,7 @@ fun PaymentEntryScreen(
             onQrPayment = {
                 showQrDialog.value = false
                 showPaymentDialog.value=true
-                viewModel.checkout("QR Payment")
+
             },
             onCashPayment={
                 viewModel.checkout("Cash")
@@ -119,8 +119,12 @@ fun PaymentEntryScreen(
         QrPaymentAlert(
             amount = "%.2f".format(totalAmount.value),
             qrPainter = painterResource(id = R.drawable.baseline_qr_code_2_24), // replace with your QR
-            onDismiss = { showPaymentDialog.value = false }
+            onDismiss = {
+                viewModel.checkout("QR Payment")
+                showPaymentDialog.value = false
+            }
         )
+
     }
     Scaffold(
         topBar = {
@@ -141,6 +145,16 @@ fun PaymentEntryScreen(
                         Icon(
                             painterResource(R.drawable.outline_contract_24),
                             contentDescription = "Settings"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            viewModel.initNewShopping()
+                        }
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.baseline_refresh_24),
+                            contentDescription = "Refresh"
                         )
                     }
                 }
