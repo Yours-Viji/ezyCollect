@@ -576,19 +576,19 @@ fun CartItemRow(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = item.product_name,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "RM${"%.2f".format(item.price.toDouble() ?: 0.0)} each",
-                    fontSize = 14.sp,
+                    fontSize = 11.sp,
                     color = Color.Gray
                 )
             }
@@ -599,7 +599,7 @@ fun CartItemRow(
                     painter = painterResource(id = R.drawable.outline_remove_24),
                     contentDescription = "Decrease",
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(21.dp)
                         .clickable {
                             if (item.quantity > 1) {
                                 onUpdateQuantity(item.quantity - 1)
@@ -609,15 +609,15 @@ fun CartItemRow(
 
                 Text(
                     text = "${item.quantity}",
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    fontSize = 16.sp
+                    modifier = Modifier.padding(horizontal = 5.dp),
+                    fontSize = 13.sp
                 )
 
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Increase",
                     modifier = Modifier
-                        .size(24.dp)
+                        .size(21.dp)
                         .clickable {
                             onUpdateQuantity(item.quantity + 1)
                         }
@@ -627,7 +627,7 @@ fun CartItemRow(
             Text(
                 text = "RM${"%.2f".format(item.price.toDouble() * item.quantity)}",
                 modifier = Modifier.padding(horizontal = 8.dp),
-                fontSize = 16.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -635,9 +635,9 @@ fun CartItemRow(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Remove",
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(22.dp)
                     .clickable { onRemove() }
-                    .padding(start = 8.dp)
+                    .padding(start = 5.dp)
             )
         }
     }

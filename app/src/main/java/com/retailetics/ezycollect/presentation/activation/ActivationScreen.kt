@@ -91,6 +91,7 @@ fun ActivationScreen(
 
     LaunchedEffect(state.isActivationSuccessful) {
         if (state.isActivationSuccessful) {
+            viewModel.hideLoadingIndicator()
             onLoginSuccess()
         }
     }

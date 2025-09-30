@@ -102,6 +102,9 @@ class ActivationViewModel @Inject constructor(
             preferencesManager.setDeviceActivated()
         }
     }*/
+    fun hideLoadingIndicator(){
+        loadingManager.hide()
+    }
     fun activateDevice() {
         loadingManager.show()
         viewModelScope.launch {
@@ -121,15 +124,17 @@ class ActivationViewModel @Inject constructor(
                 _stateFlow.value.termsAccepted
             )) {
                 is NetworkResponse.Success -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false,
                         isActivationSuccessful = true
                     )
                     preferencesManager.setDeviceActivated()
                     saveActivationDetails("${result.data.merchantId}", "${result.data.merchantId}")
-                    loadingManager.hide()
+
                 }
                 is NetworkResponse.Error -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false,
                         error = result.message ?: "Activation failed",
@@ -138,7 +143,7 @@ class ActivationViewModel @Inject constructor(
                     /*if(result.message.contains("Error: Already a device activated with same device Id")){
                        // getDeviceInfo()
                     }*/
-                    loadingManager.hide()
+
                 }
             }
         }
