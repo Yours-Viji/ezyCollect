@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.size.Size
 import com.retailetics.ezycollect.R
@@ -238,7 +239,9 @@ fun PaymentEntryScreen(
                                     }
                                 },
                                 placeholder = { Text("0.00") },
-                                modifier = Modifier.width(100.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(horizontal = 4.dp),
                                 singleLine = true,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 prefix = { Text("RM") }
@@ -263,16 +266,9 @@ fun PaymentEntryScreen(
                                 if (itemPrice.isNotBlank()) {
                                     val price = itemPrice.toDoubleOrNull() ?: 0.0
                                     if (price > 0) {
-                                        /*val newItem = CartItem(
-                                            id = nextItemId++,
-                                            name = if (itemName.isBlank()) "Item ${nextItemId-1}" else itemName,
-                                            price = price
-                                        )*/
-                                        viewModel.addProductToShoppingCart(itemName,1,price)
-                                        //cartItems = cartItems + newItem
+                                        viewModel.addProductToShoppingCart(itemName, 1, price)
                                         itemName = ""
                                         itemPrice = ""
-
                                     }
                                 }
                             },
@@ -418,11 +414,14 @@ fun PaymentEntryScreen(
 
     // Cart Dialog
     if (showCartDialog) {
-        Dialog(onDismissRequest = { showCartDialog = false }) {
+        Dialog(
+            onDismissRequest = { showCartDialog = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(500.dp),
+                    .fillMaxSize()
+                    .padding(16.dp), // Add some padding so it doesn't touch screen edges
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -439,14 +438,13 @@ fun PaymentEntryScreen(
                                 item = item,
                                 onRemove = {
                                     viewModel.deleteProductFromShoppingCart(item.id)
-                                    //cartItems = cartItems.filter { it.id != item.id }
                                 },
                                 onUpdateQuantity = { newQuantity ->
-                                    viewModel.editProductInShoppingCart(item.price.toDouble(),newQuantity,item.id)
-                                  /*  cartItems = cartItems.map {
-                                        if (it.id == item.id) it.copy(quantity = newQuantity)
-                                        else it
-                                    }*/
+                                    viewModel.editProductInShoppingCart(
+                                        item.price.toDouble(),
+                                        newQuantity,
+                                        item.id
+                                    )
                                 }
                             )
                         }
@@ -464,10 +462,10 @@ fun PaymentEntryScreen(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
-
-
                     }
+
                     Spacer(modifier = Modifier.height(8.dp))
+
                     Row {
                         // ❌ Cancel Button (Red)
                         Button(
@@ -475,7 +473,9 @@ fun PaymentEntryScreen(
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Red
                             ),
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
                         ) {
                             Text("Cancel", color = Color.White)
                         }
@@ -483,13 +483,13 @@ fun PaymentEntryScreen(
                         // ✅ Pay Now Button (Green)
                         Button(
                             onClick = {
-                                // Handle Pay Now click
                                 showCartDialog = false
-                                showQrDialog.value=true
+                                showQrDialog.value = true
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4CAF50) // Green
-                            )
+                            ),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text("Pay Now", color = Color.White)
                         }
@@ -497,7 +497,6 @@ fun PaymentEntryScreen(
                 }
             }
         }
-
     }
 }
 
