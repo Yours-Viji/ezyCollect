@@ -43,27 +43,7 @@ class HomeViewModel @Inject constructor(
     private val _totalAmount = MutableStateFlow(0.0)
     val totalAmount: StateFlow<Double> = _totalAmount.asStateFlow()
 
-    private val _shoppingCartInfo = MutableStateFlow<ShoppingCartDetails?>(null)
-    val shoppingCartInfo: StateFlow<ShoppingCartDetails?> = _shoppingCartInfo.asStateFlow()
 
-    private val _employeeName = MutableStateFlow("")
-    val employeeName: StateFlow<String> = _employeeName.asStateFlow()
-
-    val cartId: StateFlow<String?> = getCartIdUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
-    init {
-        viewModelScope.launch {
-            val savedAppMode = preferencesManager.getAppMode()
-
-            _employeeName.update { preferencesManager.getEmployeeName() }
-
-        }
-
-    }
 
     fun initNewShopping(){
         clearCartDetails()
@@ -74,7 +54,6 @@ class HomeViewModel @Inject constructor(
         _cartDataList.value = emptyList()
         _cartCount.value = 0
         _totalAmount.value = 0.0
-        _shoppingCartInfo.value = null
     }
     private fun createNewShoppingCart() {
         loadingManager.show()
@@ -100,28 +79,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getShoppingCartDetails() {
-        loadingManager.show()
-        viewModelScope.launch {
-            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
-            when (val result = shoppingUseCase()) {
-                is NetworkResponse.Success -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false
-                    )
-                    _cartDataList.value=result.data.items
-                    loadingManager.hide()
-                }
-                is NetworkResponse.Error -> {
-                    _stateFlow.value = _stateFlow.value.copy(
-                        isLoading = false,
-                        error = result.message,
-                    )
-                    loadingManager.hide()
-                }
-            }
-        }
-    }
+
 
     fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
         loadingManager.show()
@@ -135,7 +93,7 @@ class HomeViewModel @Inject constructor(
 
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
-                    _totalAmount.value=result.data.subtotal.toDouble()
+                    _totalAmount.value=result.data.subtotal
                     loadingManager.hide()
 
                 }

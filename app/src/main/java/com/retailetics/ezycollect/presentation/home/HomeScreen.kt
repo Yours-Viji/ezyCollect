@@ -1,5 +1,6 @@
 package com.retailetics.ezycollect.presentation.home
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -47,11 +49,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,9 +66,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.size.Size
 import com.retailetics.ezycollect.R
 import com.retailetics.ezycollect.data.remote.dto.Item
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /*// Data class for items
 data class CartItem(
@@ -80,8 +87,10 @@ fun PaymentEntryScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onViewTransaction: () -> Unit,
 ) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val cartDataList = viewModel.cartDataList.collectAsState()
     val totalAmount = viewModel.totalAmount.collectAsState()
+    val cartCount = viewModel.cartCount.collectAsState()
 
     var itemName by remember { mutableStateOf("") }
     var itemPrice by remember { mutableStateOf("") }
@@ -92,9 +101,18 @@ fun PaymentEntryScreen(
 
     var showQrDialog = remember { mutableStateOf(false) }
     var showPaymentDialog = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         //focusRequester.requestFocus()
         viewModel.initNewShopping()
+    }
+    LaunchedEffect(state.error) {
+        state.error?.let { errorMessage ->
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            // Optional: Clear the error after showing
+            // viewModel.clearError()
+        }
     }
     if (showQrDialog.value) {
         PaymentOptionDialog(
@@ -137,6 +155,55 @@ fun PaymentEntryScreen(
                     actionIconContentColor = Color.White // Optional: set icon color
                 ),
                 actions = {
+                    // Cart Icon with Badge
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 1.dp)
+                    ) {
+                        IconButton(
+                            onClick = {
+                                // Handle cart click - open cart dialog or navigate to cart screen
+                                showCartDialog = true
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_cart), // Use your cart icon
+                                contentDescription = "Shopping Cart",
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        // Badge for item count
+                        if (cartCount.value > 0) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .size(20.dp)
+                                    .background(Color.Red, CircleShape)
+                            ) {
+                                Text(
+                                    text = if (cartCount.value > 9) "9+" else cartCount.value.toString(),
+                                    color = Color.White,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    IconButton(
+                        onClick = {
+                            viewModel.initNewShopping()
+                        }
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.baseline_refresh_24),
+                            contentDescription = "Refresh",
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
                     IconButton(
                         onClick = {
                             onViewTransaction()
@@ -145,19 +212,12 @@ fun PaymentEntryScreen(
                     ) {
                         Icon(
                             painterResource(R.drawable.outline_contract_24),
-                            contentDescription = "Settings"
+                            contentDescription = "Settings",
+                                    modifier = Modifier.size(30.dp)
                         )
                     }
-                    IconButton(
-                        onClick = {
-                            viewModel.initNewShopping()
-                        }
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.baseline_refresh_24),
-                            contentDescription = "Refresh"
-                        )
-                    }
+
+
                 }
             )
         }
@@ -267,8 +327,11 @@ fun PaymentEntryScreen(
                                     val price = itemPrice.toDoubleOrNull() ?: 0.0
                                     if (price > 0) {
                                         viewModel.addProductToShoppingCart(itemName, 1, price)
-                                        itemName = ""
-                                        itemPrice = ""
+                                        scope.launch {
+                                            delay(100L)
+                                            itemName = ""
+                                            itemPrice = ""
+                                        }
                                     }
                                 }
                             },
