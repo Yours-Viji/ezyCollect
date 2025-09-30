@@ -39,8 +39,8 @@ class TransactionViewModel @Inject constructor(
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> get() = _error
 
-    private val _totalCollection = MutableStateFlow(0)
-    val totalCollection: StateFlow<Int> get() = _totalCollection
+    private val _totalCollection = MutableStateFlow(0.0)
+    val totalCollection: StateFlow<Double> get() = _totalCollection
 
     private val _totalTransaction = MutableStateFlow(0)
     val totalTransaction: StateFlow<Int> get() = _totalTransaction
@@ -58,7 +58,10 @@ class TransactionViewModel @Inject constructor(
                         isLoading = false
                     )
                     _transactionReport.value = result.data.transactions
-                    _totalCollection.value=result.data.totalCollection
+                    try {
+                        _totalCollection.value=result.data.totalCollection
+                    } catch (e: Exception) {
+                    }
                     _totalTransaction.value=result.data.count
                     loadingManager.hide()
                     _isLoading.value = false

@@ -40,6 +40,7 @@ import com.retailetics.ezycollect.data.remote.dto.TransactionReport
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -317,7 +318,7 @@ fun TransactionReportScreen(
 }
 // New Summary Card Component
 @Composable
-fun SummaryCard(totalCollection: Int, totalTransactions: Int) {
+fun SummaryCard(totalCollection: Double, totalTransactions: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -419,7 +420,7 @@ fun TransactionCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "By ${transaction.full_name} • ${formatDate(transaction.created_at)}",
+                        text = "By ${transaction.full_name} • ${formatDate(transaction.created_date)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
@@ -547,14 +548,45 @@ fun isValidDateFormat(date: String): Boolean {
     }
 }
 
-// Utility function to format date
-fun formatDate(dateString: String): String {
+/// Utility function to format date - FIXED to handle null
+fun formatDate(dateString: String?): String {
+    // Handle null case first
+    if (dateString == null || dateString.isBlank()) {
+        return "Date not available"
+    }
+
     return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
-        val date = inputFormat.parse(dateString)
-        outputFormat.format(date ?: Date())
+        // Try multiple common date formats
+        val formats = arrayOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "dd-MM-yyyy HH:mm:ss",
+            "dd/MM/yyyy HH:mm:ss"
+        )
+
+        var parsedDate: Date? = null
+        for (format in formats) {
+            try {
+                val inputFormat = SimpleDateFormat(format, Locale.getDefault())
+                inputFormat.timeZone = TimeZone.getTimeZone("UTC") // Handle UTC times
+                parsedDate = inputFormat.parse(dateString)
+                if (parsedDate != null) break
+            } catch (e: Exception) {
+                // Try next format
+                continue
+            }
+        }
+
+        if (parsedDate != null) {
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
+            outputFormat.timeZone = TimeZone.getDefault() // Convert to local timezone
+            outputFormat.format(parsedDate)
+        } else {
+            "Invalid date format"
+        }
     } catch (e: Exception) {
-        dateString
+        "Date format error"
     }
 }
