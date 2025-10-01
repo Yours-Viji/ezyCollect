@@ -86,6 +86,7 @@ class LoginViewModel @Inject constructor(
             try {
                 when (val result = loginUseCase(email, password, pin)) {
                     is NetworkResponse.Success -> {
+                        preferencesManager.setLoggedIn(true)
                         _stateFlow.value = _stateFlow.value.copy(
                             isLoading = false,
                             isLoginSuccessful = true,

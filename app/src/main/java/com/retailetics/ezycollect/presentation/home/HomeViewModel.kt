@@ -55,6 +55,16 @@ class HomeViewModel @Inject constructor(
         _cartCount.value = 0
         _totalAmount.value = 0.0
     }
+    fun setLoggedOut(){
+        viewModelScope.launch {
+            preferencesManager.setLoggedIn(false)
+            _stateFlow.value = _stateFlow.value.copy(
+                isLoading = false,
+                error = "LogOut Success",
+                isLogOutSuccess = true
+            )
+        }
+    }
     private fun createNewShoppingCart() {
         loadingManager.show()
         clearCartDetails()

@@ -63,9 +63,7 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        //enableEdgeToEdge()
         setContent {
-
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -73,128 +71,22 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val splashViewModel: SplashViewModel = hiltViewModel()
-                    val isActivated = splashViewModel.isDeviceActivated.collectAsState()
+                    val startDestination = splashViewModel.startDestination.collectAsState()
+
                     splashViewModel.getDeviceId(this)
 
-
-
-                    /*when (isActivated.value) {
+                    // Show loading while determining destination
+                    when (val destination = startDestination.value) {
                         null -> {
-                            // Optional loading UI
-                            Text("Checking device activation...")
-                        }
-
-                        else -> {
-                            val startDestination =
-                                if (isActivated.value == false) "activation" else "login"
-
-                            NavHost(navController, startDestination = startDestination) {
-                                composable("activation") {
-                                    ActivationScreen(
-                                        onLoginSuccess = {
-                                            navController.navigate("login") {
-                                                popUpTo("activation") { inclusive = true }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("login") {
-
-                                    LoginScreen(
-
-                                        onThemeChange = {
-                                            // 🔹 Handle theme change
-                                            //  Toast.makeText(this, "Theme change clicked", Toast.LENGTH_SHORT).show()
-                                        },
-                                        onLanguageChange = {
-                                            // 🔹 Handle language change
-                                            // Toast.makeText(this, "Language change clicked", Toast.LENGTH_SHORT).show()
-                                        },
-                                        onLoginSuccess = {
-                                            navController.navigate("home") {
-                                                popUpTo("login") { inclusive = true }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("home") {
-
-                                    PaymentEntryScreen(
-                                        onViewTransaction = {
-                                            navController.navigate("transaction") {
-                                                popUpTo("transaction") { inclusive = false }
-                                            }
-                                        }
-                                    )
-                                }
-                                composable("transaction") {
-
-                                    TransactionReportScreen(
-
-                                    )
-                                }
-                            }
-
-                        }
-                    }*/
-                    val startDestination = when (isActivated.value) {
-                        null -> "activation" // If null (new installation), go to activation
-                        false -> "activation" // Not registered
-                        true -> "login" // Already registered
-                    }
-                    NavHost(navController, startDestination = startDestination) {
-                        composable("activation") {
-                            ActivationScreen(
-                                onLoginSuccess = {
-                                    navController.navigate("login") {
-                                        popUpTo("activation") { inclusive = true }
-                                    }
-                                }
-                            )
-                        }
-                        composable("login") {
-                            LoginScreen(
-                                onThemeChange = { /* handle */ },
-                                onLanguageChange = { /* handle */ },
-                                onLoginSuccess = {
-                                    navController.navigate("home") {
-                                        popUpTo("login") { inclusive = true }
-                                    }
-                                }
-                            )
-                        }
-                        composable("home") {
-                            PaymentEntryScreen(
-                                onViewTransaction = {
-                                    navController.navigate("transaction") {
-                                        popUpTo("transaction") { inclusive = false }
-                                    }
-                                }
-                            )
-                        }
-                        composable("transaction") {
-                            TransactionReportScreen()
-                        }
-                    }
-                    /*when (isActivated.value) {
-                        null -> {
-                            // Show loading or splash screen
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator()
-                                Text("Checking Registration...")
                             }
                         }
                         else -> {
-                            val startDestination = when (isActivated.value) {
-                                false -> "activation"  // Not registered or new installation
-                                true -> "login"        // Already registered
-                                else -> "activation"   // Fallback
-                            }
-
-                            NavHost(navController, startDestination = startDestination) {
+                            NavHost(navController, startDestination = destination) {
                                 composable("activation") {
                                     ActivationScreen(
                                         onLoginSuccess = {
@@ -206,8 +98,8 @@ class MainActivity : ComponentActivity() {
                                 }
                                 composable("login") {
                                     LoginScreen(
-                                        onThemeChange = { *//* handle *//* },
-                                        onLanguageChange = { *//* handle *//* },
+                                        onThemeChange = { /* handle */ },
+                                        onLanguageChange = { /* handle */ },
                                         onLoginSuccess = {
                                             navController.navigate("home") {
                                                 popUpTo("login") { inclusive = true }
@@ -219,7 +111,12 @@ class MainActivity : ComponentActivity() {
                                     PaymentEntryScreen(
                                         onViewTransaction = {
                                             navController.navigate("transaction") {
-                                                popUpTo("transaction") { inclusive = false }
+                                                popUpTo("home") { inclusive = false }
+                                            }
+                                        },
+                                                onLoggedOut = {
+                                            navController.navigate("login") {
+                                                popUpTo("home") { inclusive = true }
                                             }
                                         }
                                     )
@@ -229,7 +126,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-                    }*/
+                    }
+
                     GlobalLoadingOverlay(loadingManager)
                 }
             }

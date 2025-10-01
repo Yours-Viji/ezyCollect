@@ -94,6 +94,7 @@ data class CartItem(
 fun PaymentEntryScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onViewTransaction: () -> Unit,
+    onLoggedOut: () -> Unit,
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val cartDataList = viewModel.cartDataList.collectAsState()
@@ -112,6 +113,11 @@ fun PaymentEntryScreen(
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val context = LocalContext.current
+    LaunchedEffect(state.isLogOutSuccess) {
+        if (state.isLogOutSuccess) {
+            onLoggedOut()
+        }
+    }
     LaunchedEffect(Unit) {
         //focusRequester.requestFocus()
         viewModel.initNewShopping()
@@ -165,7 +171,7 @@ fun PaymentEntryScreen(
                 },
                 onLogOutSelected = {
                     scope.launch { drawerState.close() }
-                  //  onTransactionCalled()
+                    viewModel.setLoggedOut()
                 },
 
             )

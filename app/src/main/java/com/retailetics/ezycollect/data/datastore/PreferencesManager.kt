@@ -29,6 +29,7 @@ class PreferencesManager @Inject constructor(
         private val MERCHANT_ID = stringPreferencesKey("merchant_id")
         private val OUTLET_ID = stringPreferencesKey("outlet_id")
         private val IS_DEVICE_ACTIVATED = booleanPreferencesKey("is_device_activated")
+        private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         private val APP_MODE = stringPreferencesKey("app_mode")
         private val SHOPPING_CART_ID = stringPreferencesKey("cart_id")
 
@@ -101,7 +102,15 @@ class PreferencesManager @Inject constructor(
         dataStore.edit { preferences ->
             preferences[IS_DEVICE_ACTIVATED] = true
         }
+
     }
+    suspend fun setLoggedIn(isLogged:Boolean){
+        dataStore.edit { preferences ->
+            preferences[IS_LOGGED_IN] = isLogged
+        }
+
+    }
+
     suspend fun setAppMode(appMode: AppMode){
         dataStore.edit { preferences ->
             preferences[APP_MODE] = appMode.name
@@ -147,6 +156,11 @@ class PreferencesManager @Inject constructor(
         return dataStore.data.map { preferences ->
             preferences[IS_DEVICE_ACTIVATED]
         }.distinctUntilChanged()
+
+    }
+
+    suspend fun isLoggedIn(): Boolean {
+        return dataStore.data.first()[IS_LOGGED_IN] ?: false
 
     }
 
