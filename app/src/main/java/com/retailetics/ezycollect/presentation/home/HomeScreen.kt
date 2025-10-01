@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,20 +30,26 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +60,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -102,6 +110,7 @@ fun PaymentEntryScreen(
     var showQrDialog = remember { mutableStateOf(false) }
     var showPaymentDialog = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         //focusRequester.requestFocus()
@@ -124,10 +133,10 @@ fun PaymentEntryScreen(
             },
             onQrPayment = {
                 showQrDialog.value = false
-                showPaymentDialog.value=true
+                showPaymentDialog.value = true
 
             },
-            onCashPayment={
+            onCashPayment = {
                 viewModel.checkout("Cash")
                 showQrDialog.value = false
             }
@@ -145,15 +154,45 @@ fun PaymentEntryScreen(
         )
 
     }
-    Scaffold(
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            DrawerContent(
+                onTransActionSelected = {
+                    scope.launch { drawerState.close() }
+                    onViewTransaction()
+
+                },
+                onLogOutSelected = {
+                    scope.launch { drawerState.close() }
+                  //  onTransactionCalled()
+                },
+
+            )
+        }
+    ) { Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Payment Entry") },
+                title = { Text("Transaction Entry") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White // Optional: set icon color
                 ),
+                navigationIcon = {
+                    IconButton(
+                        onClick = {scope.launch { drawerState.open() }},
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = Color.White
+                        )
+                    }
+                },
                 actions = {
                     // Cart Icon with Badge
                     Box(
@@ -191,7 +230,7 @@ fun PaymentEntryScreen(
                             }
                         }
                     }
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(20.dp))
                     IconButton(
                         onClick = {
                             viewModel.initNewShopping()
@@ -204,7 +243,7 @@ fun PaymentEntryScreen(
                         )
                     }
                     Spacer(Modifier.width(10.dp))
-                    IconButton(
+                   /* IconButton(
                         onClick = {
                             onViewTransaction()
                             println("Icon clicked!")
@@ -213,15 +252,15 @@ fun PaymentEntryScreen(
                         Icon(
                             painterResource(R.drawable.outline_contract_24),
                             contentDescription = "Settings",
-                                    modifier = Modifier.size(30.dp)
+                            modifier = Modifier.size(30.dp)
                         )
-                    }
+                    }*/
 
 
                 }
             )
         }
-    ) {  innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -230,7 +269,7 @@ fun PaymentEntryScreen(
                 .verticalScroll(rememberScrollState()) // Make the entire column scrollable
         ) {
             // Header
-           /* Text(
+            /* Text(
                 text = "Menu",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -246,7 +285,14 @@ fun PaymentEntryScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
+                    OutlinedTextField(
+                        value = itemName,
+                        onValueChange = { itemName = it },
+                        label = { Text("Enter product name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    /*Text(
                         text = "Enter product name",
                         fontSize = 16.sp,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -258,10 +304,9 @@ fun PaymentEntryScreen(
                         placeholder = { Text("Product name") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
-                    )
+                    )*/
 
                     Spacer(modifier = Modifier.height(10.dp))
-
                     Text(
                         text = "Price",
                         fontSize = 16.sp,
@@ -277,7 +322,7 @@ fun PaymentEntryScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
+                            /*Icon(
                                 painter = painterResource(id = R.drawable.outline_remove_24),
                                 contentDescription = "Decrease",
                                 modifier = Modifier
@@ -290,7 +335,7 @@ fun PaymentEntryScreen(
                                     }
                                     .padding(4.dp)
                             )
-
+*/
                             OutlinedTextField(
                                 value = itemPrice,
                                 onValueChange = {
@@ -307,7 +352,7 @@ fun PaymentEntryScreen(
                                 prefix = { Text("RM") }
                             )
 
-                            Icon(
+                          /*  Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Increase",
                                 modifier = Modifier
@@ -317,7 +362,7 @@ fun PaymentEntryScreen(
                                         itemPrice = "%.2f".format(currentPrice + 0.10)
                                     }
                                     .padding(4.dp)
-                            )
+                            )*/
                         }
 
                         // Enter button
@@ -391,7 +436,9 @@ fun PaymentEntryScreen(
                             .fillMaxSize()
                             .padding(8.dp)
                     ) {
-                        items(cartDataList.value.reversed().take(2)) { item -> // Show only up to 5 items
+                        items(
+                            cartDataList.value.reversed().take(2)
+                        ) { item -> // Show only up to 5 items
                             CartItemRow(
                                 item = item,
                                 onRemove = {
@@ -399,8 +446,12 @@ fun PaymentEntryScreen(
                                     //cartItems = cartDataList.value.filter { it.id != item.id }
                                 },
                                 onUpdateQuantity = { newQuantity ->
-                                    viewModel.editProductInShoppingCart(item.price.toDouble(),newQuantity,item.id)
-                                   /* cartItems = cartItems.map {
+                                    viewModel.editProductInShoppingCart(
+                                        item.price.toDouble(),
+                                        newQuantity,
+                                        item.id
+                                    )
+                                    /* cartItems = cartItems.map {
                                         if (it.id == item.id) it.copy(quantity = newQuantity)
                                         else it
                                     }*/
@@ -456,7 +507,7 @@ fun PaymentEntryScreen(
 
                     Button(
                         onClick = {
-                            showQrDialog.value=true
+                            showQrDialog.value = true
                             // Process payment logic here
                             // This button should ideally navigate or trigger an action
                             // For now, we can show a Toast or a Snackbar if needed for testing
@@ -474,6 +525,7 @@ fun PaymentEntryScreen(
 
         }
     }
+}
 
     // Cart Dialog
     if (showCartDialog) {
@@ -562,7 +614,78 @@ fun PaymentEntryScreen(
         }
     }
 }
+@Composable
+fun DrawerContent(
+    onTransActionSelected: () -> Unit,
+    onLogOutSelected: () -> Unit,
+) {
 
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(350.dp)
+            .background(MaterialTheme.colorScheme.surface),
+        verticalArrangement = Arrangement.Top
+    ) {
+        Spacer(Modifier.height(50.dp))
+        /* Image(
+             painter = painterResource(id = R.drawable.ic_merchant_logo),
+             contentDescription = "Ad Banner",
+             contentScale = ContentScale.Crop,
+             modifier = Modifier.fillMaxWidth().height(70.dp)
+         )
+
+         Divider()*/
+
+        Spacer(Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onTransActionSelected() }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.transaction),
+                contentDescription = "transaction",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "View Transaction",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+        Divider()
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onLogOutSelected() }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.outline_logout_24),
+                contentDescription = "transaction",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "Log Out",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+        }
+
+    }
+}
 @Composable
 fun CartItemRow(
     item: Item,
