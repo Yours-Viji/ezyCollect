@@ -43,7 +43,7 @@ class SplashViewModel @Inject constructor(
         isLoggedIn
     ) { isActivated, isLoggedIn ->
         when {
-            isActivated == null || isLoggedIn == null -> null // Still loading
+            isActivated == null || isLoggedIn == null -> "activation" // Still loading
             !isActivated -> "activation" // Not activated
             isActivated && isLoggedIn -> "home" // Activated and logged in
             else -> "login" // Activated but not logged in
