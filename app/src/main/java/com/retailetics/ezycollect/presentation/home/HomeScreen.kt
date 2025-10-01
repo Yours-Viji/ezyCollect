@@ -868,7 +868,7 @@ fun PaymentOptionDialog(
                 )
 
                 // Tap to Pay option
-                Button(
+                /*Button(
                     onClick = onTapToPay,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -885,7 +885,7 @@ fun PaymentOptionDialog(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text("Tap to Pay (Credit / Debit Card)", color = Color.White)
-                }
+                }*/
 
                 // QR Payment option
                 Button(

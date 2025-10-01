@@ -420,7 +420,7 @@ fun TransactionCard(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "By ${transaction.full_name} • ${formatDate(transaction.created_date)}",
+                        text = "By ${transaction.full_name} • ${transaction.created_date}-${transaction.created_time}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )

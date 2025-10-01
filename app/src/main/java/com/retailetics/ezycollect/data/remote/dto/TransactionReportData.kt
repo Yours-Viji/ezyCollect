@@ -7,6 +7,7 @@ data class TransactionReportData(
 )
 data class TransactionReport(
     val created_date: String,
+    val created_time: String,
     val full_name: String,
     val items: List<TransactionData>,
     val order_id: Int,
