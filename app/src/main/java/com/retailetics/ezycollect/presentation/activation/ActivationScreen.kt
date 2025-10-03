@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -49,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -108,6 +112,9 @@ fun ActivationScreen(
         }
     }
 
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -131,8 +138,8 @@ fun ActivationScreen(
                 .padding(innerPadding)
                 .padding(5.dp)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(5.dp)
+                .verticalScroll(scrollState)
+                .imePadding()
         ) {
             // Full Name Field with validation
             OutlinedTextField(
@@ -302,7 +309,15 @@ fun ActivationScreen(
                 },
                 label = { Text("Login Pin") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusEvent { focusState ->
+                        if (focusState.isFocused) {
+                            coroutineScope.launch {
+                                bringIntoViewRequester.bringIntoView()
+                            }
+                        }
+                    },
                 isError = validationErrors.value.containsKey("loginPin"),
                 supportingText = {
                     validationErrors.value["loginPin"]?.let { error ->
@@ -367,45 +382,55 @@ fun ActivationScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Button(
-                onClick = {
-                    // Perform validation before activating device
-                    val errors = validateFields(state)
-                    if (errors.isEmpty()) {
-                        viewModel.activateDevice()
-                    } else {
-                        validationErrors.value = errors
-                    }
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
+            Box(
+                modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester)
             ) {
-                Text("Submit")
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(
+                        onClick = {
+                            // Perform validation before activating device
+                            val errors = validateFields(state)
+                            if (errors.isEmpty()) {
+                                viewModel.activateDevice()
+                            } else {
+                                validationErrors.value = errors
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth()
+                    ) {
+                        Text("Submit")
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "(OR)",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = "Already Registered?",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Button(
+                        onClick = {
+                            onLoginSuccess()
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(R.color.colorGreen),
+                            contentColor = Color.White
+                        ),
+                    ) {
+                        Text("Login")
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "(OR)",
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
-            )
-            Text(
-                text = "Already Registered?",
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 4.dp).align(Alignment.CenterHorizontally)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Button(
-                onClick = {
-                    onLoginSuccess()
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally).fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.colorGreen),
-                    contentColor = Color.White
-                ),
-            ) {
-                Text("Login")
-            }
+
         }
     }
 
