@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,5 +86,10 @@ class TransactionViewModel @Inject constructor(
     fun clearTransactions() {
         _transactionReport.value = emptyList()
         _error.value = ""
+    }
+
+    fun getCurrentDate(): String {
+        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return formatter.format(Date())
     }
 }

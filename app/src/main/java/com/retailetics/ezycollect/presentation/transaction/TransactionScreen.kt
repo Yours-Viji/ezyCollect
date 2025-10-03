@@ -6,6 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -41,6 +45,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,8 +66,8 @@ fun TransactionReportScreen(
     val totalTransaction = viewModel.totalTransaction.collectAsState()
     val totalCollection = viewModel.totalCollection.collectAsState()
 
-    var startDate = remember { mutableStateOf("") }
-    var endDate = remember { mutableStateOf("") }
+    var startDate = remember { mutableStateOf(viewModel.getCurrentDate()) }
+    var endDate = remember { mutableStateOf(viewModel.getCurrentDate()) }
     var expandedTransactionId = remember { mutableStateOf<Int?>(null) }
 
     // Date validation
@@ -115,7 +128,7 @@ fun TransactionReportScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         // Start Date Field
-                        OutlinedTextField(
+                       /* OutlinedTextField(
                             value = startDate.value,
                             onValueChange = { startDate.value = it },
                             label = { Text("Start Date") },
@@ -129,24 +142,19 @@ fun TransactionReportScreen(
                                     Text("Use format: YYYY-MM-DD")
                                 }
                             }
-                        )
+                        )*/
+                        CustomDatePickerField(selectedDate = startDate.value,
+                            onDateSelected = { selectedDate ->
+                                startDate.value = selectedDate
+                            },
+                            modifier = Modifier.weight(1f))
 
-                        // End Date Field
-                        OutlinedTextField(
-                            value = endDate.value,
-                            onValueChange = { endDate.value = it },
-                            label = { Text("End Date") },
-                            modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            shape = MaterialTheme.shapes.medium,
-                            placeholder = { Text("YYYY-MM-DD") },
-                            isError = !isEndDateValid,
-                            supportingText = {
-                                if (!isEndDateValid) {
-                                    Text("Use format: YYYY-MM-DD")
-                                }
-                            }
-                        )
+                        CustomDatePickerField(selectedDate = endDate.value,
+                            onDateSelected = { selectedDate ->
+                                endDate.value = selectedDate
+                            },
+                            modifier = Modifier.weight(1f))
+
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -194,8 +202,8 @@ fun TransactionReportScreen(
                             onClick = {
                                 // Clear all states
                                 viewModel.clearTransactions()
-                                startDate.value = ""
-                                endDate.value = ""
+                                startDate.value = viewModel.getCurrentDate()
+                                endDate.value = viewModel.getCurrentDate()
                                 expandedTransactionId.value = null
                             },
                             modifier = Modifier
@@ -315,6 +323,128 @@ fun TransactionReportScreen(
             }
         }
     }
+}
+
+
+@Composable
+fun CustomDatePickerField(
+    selectedDate: String,
+    onDateSelected: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var showDatePicker = remember { mutableStateOf(false) } // Initialize as false
+
+    // Parse current date if exists
+    val calendar = Calendar.getInstance()
+    if (selectedDate.isNotEmpty()) {
+        try {
+            val parts = selectedDate.split("-")
+            if (parts.size == 3) {
+                calendar.set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    val year = remember { mutableStateOf(calendar.get(Calendar.YEAR)) }
+    val month = remember { mutableStateOf(calendar.get(Calendar.MONTH)) }
+    val day = remember { mutableStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
+
+    // Clickable field that opens date picker
+    OutlinedTextField(
+        value = selectedDate,
+        onValueChange = { },
+        label = { Text("Start Date") },
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                showDatePicker.value = true
+            },
+        singleLine = true,
+        readOnly = true,
+        trailingIcon = {
+            Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = "Pick date",
+                modifier = Modifier.clickable {
+                    showDatePicker.value = true
+                }
+            )
+        }
+    )
+
+    // Date Picker Dialog
+    if (showDatePicker.value) {
+        AlertDialog(
+            onDismissRequest = { showDatePicker.value = false },
+            title = { Text("Select Date", style = MaterialTheme.typography.headlineSmall) },
+            text = {
+                Column {
+                    DatePicker(
+                        year = year.value,
+                        month = month.value,
+                        day = day.value, // Added day parameter
+                        onDateChanged = { y, m, d ->
+                            year.value = y
+                            month.value = m
+                            day.value = d
+                        }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val selectedDateStr = String.format(
+                            "%04d-%02d-%02d",
+                            year.value,
+                            month.value + 1,
+                            day.value
+                        )
+                        onDateSelected(selectedDateStr)
+                        showDatePicker.value = false
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDatePicker.value = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+// Updated Native Android DatePicker Composable with day parameter
+@Composable
+fun DatePicker(
+    year: Int,
+    month: Int,
+    day: Int, // Added day parameter
+    onDateChanged: (Int, Int, Int) -> Unit
+) {
+    AndroidView(
+        factory = { context ->
+            android.widget.DatePicker(context).apply {
+                init(year, month, day) { _, selectedYear, selectedMonth, selectedDay ->
+                    onDateChanged(selectedYear, selectedMonth, selectedDay)
+                }
+            }
+        },
+        update = { datePicker ->
+            datePicker.updateDate(year, month, day)
+        }
+    )
 }
 // New Summary Card Component
 @Composable
