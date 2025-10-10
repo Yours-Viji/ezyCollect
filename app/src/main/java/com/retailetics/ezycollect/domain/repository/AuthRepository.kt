@@ -1,5 +1,6 @@
 package com.retailetics.ezycollect.domain.repository
 
+import com.retailetics.ezycollect.data.remote.dto.BulkCheckoutRequest
 import com.retailetics.ezycollect.data.remote.dto.CheckoutResponse
 import com.retailetics.ezycollect.data.remote.dto.CreateCartResponse
 import com.retailetics.ezycollect.data.remote.dto.LoginResponse
@@ -17,6 +18,7 @@ interface AuthRepository {
     suspend fun createNewShoppingCart(): NetworkResponse<CreateCartResponse>
     suspend fun getShoppingCartDetails(): NetworkResponse<ShoppingCartDetails>
     suspend fun addProductToShoppingCart(name: String,quantity:Int,price:Double): NetworkResponse<ShoppingCartDetails>
+    suspend fun addBulkItemsToShoppingCart(bulkCheckoutRequest: BulkCheckoutRequest): NetworkResponse<ShoppingCartDetails>
     suspend fun deleteProductFromShoppingCart(id:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun editProductInCart(id:Int,price:Double,quantity:Int): NetworkResponse<ShoppingCartDetails>
     suspend fun checkout(merchantId: String,paymentMethod: String): NetworkResponse<CheckoutResponse>

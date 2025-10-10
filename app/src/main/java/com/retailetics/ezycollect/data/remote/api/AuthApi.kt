@@ -2,6 +2,7 @@ package com.retailetics.ezycollect.data.remote.api
 
 import com.retailetics.ezycollect.data.remote.dto.AddProductToCartRequest
 import com.retailetics.ezycollect.data.remote.dto.ApiResponse
+import com.retailetics.ezycollect.data.remote.dto.BulkCheckoutRequest
 import com.retailetics.ezycollect.data.remote.dto.CheckoutRequest
 import com.retailetics.ezycollect.data.remote.dto.CheckoutResponse
 import com.retailetics.ezycollect.data.remote.dto.CreateCartResponse
@@ -39,6 +40,9 @@ interface AuthApi {
 
     @POST("/cart/items")
     suspend fun addProductToCartApi(@Body dddProductToCartRequest: AddProductToCartRequest): Response<ShoppingCartDetails>
+
+    @POST("/cart/bulk-items")
+    suspend fun addBulkItemsToCartApi(@Body bulkCheckoutRequest: BulkCheckoutRequest): Response<ShoppingCartDetails>
 
     @HTTP(method = "DELETE", path = "/cart/{cart_Id}/items/{id}", hasBody = true)
     suspend fun deleteProductFromCart(

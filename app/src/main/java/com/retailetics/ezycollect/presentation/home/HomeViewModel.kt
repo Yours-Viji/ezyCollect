@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 
 import com.retailetics.ezycollect.data.datastore.PreferencesManager
+import com.retailetics.ezycollect.data.remote.dto.BulkCheckoutItem
+import com.retailetics.ezycollect.data.remote.dto.BulkCheckoutRequest
 import com.retailetics.ezycollect.data.remote.dto.Item
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
 
@@ -43,7 +45,7 @@ class HomeViewModel @Inject constructor(
     private val _totalAmount = MutableStateFlow(0.0)
     val totalAmount: StateFlow<Double> = _totalAmount.asStateFlow()
 
-
+    private var nextItemId = 1
 
     fun initNewShopping(){
         clearCartDetails()
@@ -54,6 +56,7 @@ class HomeViewModel @Inject constructor(
         _cartDataList.value = emptyList()
         _cartCount.value = 0
         _totalAmount.value = 0.0
+        nextItemId = 1
     }
     fun setLoggedOut(){
         viewModelScope.launch {
@@ -91,7 +94,7 @@ class HomeViewModel @Inject constructor(
 
 
 
-    fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
+  /*  fun addProductToShoppingCart(name: String,quantity:Int,price:Double) {
         loadingManager.show()
         viewModelScope.launch {
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
@@ -172,10 +175,107 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }*/
+    fun addProductToShoppingCart(name: String, quantity: Int, price: Double) {
+        viewModelScope.launch {
+            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
+
+            try {
+                // Create new item locally
+                val newItem = Item(
+                    id = nextItemId++,
+                    price = price,
+                    product_name = name,
+                    quantity = quantity
+                )
+
+                // Update local list
+                val updatedList = _cartDataList.value.toMutableList().apply {
+                    add(newItem)
+                }
+
+                _cartDataList.value = updatedList
+                updateCartSummary(updatedList)
+
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false
+                )
+
+            } catch (e: Exception) {
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false,
+                    error = "Failed to add item: ${e.message}",
+                )
+            }
+        }
     }
 
-     fun checkout(paymentMethod:String) {
-        loadingManager.show()
+    fun editProductInShoppingCart(price: Double, quantity: Int, id: Int) {
+        viewModelScope.launch {
+            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
+
+            try {
+                val updatedList = _cartDataList.value.map { item ->
+                    if (item.id == id) {
+                        item.copy(
+                            price = price,
+                            quantity = quantity
+                        )
+                    } else {
+                        item
+                    }
+                }
+
+                _cartDataList.value = updatedList
+                updateCartSummary(updatedList)
+
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false
+                )
+
+            } catch (e: Exception) {
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false,
+                    error = "Failed to update item: ${e.message}",
+                )
+            }
+        }
+    }
+
+    fun deleteProductFromShoppingCart(id: Int) {
+        viewModelScope.launch {
+            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
+
+            try {
+                val updatedList = _cartDataList.value.filter { it.id != id }
+                _cartDataList.value = updatedList
+                updateCartSummary(updatedList)
+
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false
+                )
+
+            } catch (e: Exception) {
+                _stateFlow.value = _stateFlow.value.copy(
+                    isLoading = false,
+                    error = "Failed to delete item: ${e.message}",
+                )
+            }
+        }
+    }
+
+    private fun updateCartSummary(items: List<Item>) {
+        val total = items.sumOf { it.price * it.quantity }
+        val count = items.size
+
+        _totalAmount.value = total
+        _cartCount.value = count
+    }
+    fun checkout(paymentMethod:String) {
+        addBulkItemsToShoppingCart(paymentMethod)
+    }
+     fun makePayment(paymentMethod:String) {
+      //  loadingManager.show()
         clearCartDetails()
         viewModelScope.launch {
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
@@ -198,6 +298,42 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+    fun addBulkItemsToShoppingCart(paymentMethod:String) {
+        loadingManager.show()
+        viewModelScope.launch {
+            _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
+            when (val result = shoppingUseCase.addBulkItemsToCart(convertToBulkRequest())) {
 
+                is NetworkResponse.Success -> {
+                  //  loadingManager.hide()
+                    _stateFlow.value = _stateFlow.value.copy(
+                        isLoading = false
+                    )
+                    _cartDataList.value=result.data.items
+                    _cartCount.value = result.data.items.size
+                    _totalAmount.value=result.data.subtotal
+makePayment(paymentMethod)
+
+                }
+                is NetworkResponse.Error -> {
+                    loadingManager.hide()
+                    _stateFlow.value = _stateFlow.value.copy(
+                        isLoading = false,
+                        error = result.message,
+                    )
+                }
+            }
+        }
+    }
+    private fun convertToBulkRequest(): BulkCheckoutRequest {
+        val bulkItems = _cartDataList.value.map { item ->
+            BulkCheckoutItem(
+                product_name = item.product_name,
+                price = item.price,
+                quantity = item.quantity
+            )
+        }
+        return BulkCheckoutRequest(items = bulkItems)
+    }
 
 }

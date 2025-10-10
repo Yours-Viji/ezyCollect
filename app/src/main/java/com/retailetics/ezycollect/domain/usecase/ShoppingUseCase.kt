@@ -1,5 +1,6 @@
 package com.retailetics.ezycollect.domain.usecase
 
+import com.retailetics.ezycollect.data.remote.dto.BulkCheckoutRequest
 import com.retailetics.ezycollect.data.remote.dto.CheckoutResponse
 import com.retailetics.ezycollect.data.remote.dto.CreateCartResponse
 import com.retailetics.ezycollect.data.remote.dto.NetworkResponse
@@ -20,7 +21,9 @@ class ShoppingUseCase @Inject constructor(
     suspend  fun createNewShoppingCart(): NetworkResponse<CreateCartResponse> {
         return authRepository.createNewShoppingCart()
     }
-
+    suspend  fun addBulkItemsToCart(bulkCheckoutRequest: BulkCheckoutRequest): NetworkResponse<ShoppingCartDetails> {
+        return authRepository.addBulkItemsToShoppingCart(bulkCheckoutRequest)
+    }
     suspend  fun addToCart(name: String,quantity:Int,price:Double): NetworkResponse<ShoppingCartDetails> {
         return authRepository.addProductToShoppingCart(name,quantity,price)
     }

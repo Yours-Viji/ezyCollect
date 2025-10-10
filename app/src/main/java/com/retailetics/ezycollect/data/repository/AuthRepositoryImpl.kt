@@ -85,6 +85,14 @@ class AuthRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun addBulkItemsToShoppingCart(bulkCheckoutRequest: BulkCheckoutRequest): NetworkResponse<ShoppingCartDetails> {
+        return safeApiCallRaw { authApi.addBulkItemsToCartApi(bulkCheckoutRequest) }
+            .also { result ->
+                if (result is NetworkResponse.Success) {
+                }
+            }
+    }
+
     override suspend fun editProductInCart(id:Int,price: Double,quantity:Int): NetworkResponse<ShoppingCartDetails> {
         return safeApiCallRaw { authApi.editProductQuantity(preferencesManager.getShoppingCartId(),id,EditProductRequest(price,quantity)) }
             .also { result ->
