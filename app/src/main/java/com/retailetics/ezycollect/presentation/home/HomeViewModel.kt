@@ -96,23 +96,24 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
             when (val result = shoppingUseCase.addToCart(name,quantity,price)) {
+
                 is NetworkResponse.Success -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false
                     )
-
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal
-                    loadingManager.hide()
+
 
                 }
                 is NetworkResponse.Error -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false,
                         error = result.message,
                     )
-                    loadingManager.hide()
                 }
             }
         }
@@ -124,20 +125,22 @@ class HomeViewModel @Inject constructor(
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
             when (val result = shoppingUseCase.editProductInCart(price,quantity,id)) {
                 is NetworkResponse.Success -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false
                     )
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal.toDouble()
-                    loadingManager.hide()
+
                 }
                 is NetworkResponse.Error -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false,
                         error = result.message,
                     )
-                    loadingManager.hide()
+
                 }
             }
         }
@@ -150,20 +153,22 @@ class HomeViewModel @Inject constructor(
             _stateFlow.value = _stateFlow.value.copy(isLoading = true, error = null)
             when (val result = shoppingUseCase.deleteProductFromCart(id)) {
                 is NetworkResponse.Success -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false
                     )
                     _cartDataList.value=result.data.items
                     _cartCount.value = result.data.items.size
                     _totalAmount.value=result.data.subtotal.toDouble()
-                    loadingManager.hide()
+
                 }
                 is NetworkResponse.Error -> {
+                    loadingManager.hide()
                     _stateFlow.value = _stateFlow.value.copy(
                         isLoading = false,
                         error = result.message,
                     )
-                    loadingManager.hide()
+
                 }
             }
         }

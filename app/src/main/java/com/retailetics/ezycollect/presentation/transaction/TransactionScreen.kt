@@ -72,11 +72,11 @@ fun TransactionReportScreen(
 
     // Date validation
     val isStartDateValid = remember(startDate.value) {
-        startDate.value.isEmpty() || isValidDateFormat(startDate.value)
+        startDate.value.isEmpty()/* || isValidDateFormat(startDate.value)*/
     }
 
     val isEndDateValid = remember(endDate.value) {
-        endDate.value.isEmpty() || isValidDateFormat(endDate.value)
+        endDate.value.isEmpty()/* || isValidDateFormat(endDate.value)*/
     }
 
     // Clear transactions when there's an error
@@ -180,8 +180,8 @@ fun TransactionReportScreen(
                         shape = MaterialTheme.shapes.large,
                         enabled = startDate.value.isNotEmpty() &&
                                 endDate.value.isNotEmpty() &&
-                                isStartDateValid &&
-                                isEndDateValid &&
+                               /* isStartDateValid &&
+                                isEndDateValid &&*/
                                 !isLoadingState.value
                     ) {
                         if (isLoadingState.value) {
@@ -397,10 +397,10 @@ fun CustomDatePickerField(
                 Button(
                     onClick = {
                         val selectedDateStr = String.format(
-                            "%04d-%02d-%02d",
-                            year.value,
+                            "%02d/%02d/%04d",
+                            day.value,
                             month.value + 1,
-                            day.value
+                            year.value,
                         )
                         onDateSelected(selectedDateStr)
                         showDatePicker.value = false
@@ -663,13 +663,13 @@ fun ItemRow(item: TransactionData, isLast: Boolean) {
 // Date validation function
 fun isValidDateFormat(date: String): Boolean {
     return try {
-        val regex = Regex("""^\d{4}-\d{2}-\d{2}$""")
+        val regex = Regex("""^\d{2}/\d{2}/\d{4}$""")
         if (!regex.matches(date)) return false
 
         val parts = date.split("-")
-        val year = parts[0].toInt()
+        val day = parts[0].toInt()
         val month = parts[1].toInt()
-        val day = parts[2].toInt()
+        val year = parts[2].toInt()
 
         // Basic validation
         year in 2000..2100 && month in 1..12 && day in 1..31

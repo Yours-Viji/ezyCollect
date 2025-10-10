@@ -89,7 +89,7 @@ class TransactionViewModel @Inject constructor(
     }
 
     fun getCurrentDate(): String {
-        val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return formatter.format(Date())
     }
 }
