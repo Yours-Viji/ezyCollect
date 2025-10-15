@@ -457,29 +457,32 @@ private fun validateFields(state: ActivationState): Map<String, String> {
     val errors = mutableMapOf<String, String>()
 
     // Check all fields are non-empty
-    if (state.fullName.isBlank()) {
+   /* if (state.fullName.isBlank()) {
         errors["fullName"] = "Full name is required"
     }
 
     if (state.shopName.isBlank()) {
         errors["shopName"] = "Shop/Company name is required"
-    }
+    }*/
 
-    if (state.phone.isBlank()) {
+   /* if (state.phone.isBlank()) {
         errors["phone"] = "Phone number is required"
     } else if (!isValidPhone(state.phone)) {
         errors["phone"] = "Please enter a valid phone number"
+    }*/
+    if (!isValidPhone(state.phone)) {
+        errors["phone"] = "Please enter a valid phone number"
     }
 
-    if (state.email.isBlank()) {
+   /* if (state.email.isBlank()) {
         errors["email"] = "Email address is required"
     } else if (!isValidEmail(state.email)) {
         errors["email"] = "Please enter a valid email address"
-    }
+    }*/
 
-    if (state.address.isBlank()) {
+   /* if (state.address.isBlank()) {
         errors["address"] = "Address is required"
-    }
+    }*/
 
     if (state.bankAccount.isBlank()) {
         errors["bankAccount"] = "Bank account is required"
