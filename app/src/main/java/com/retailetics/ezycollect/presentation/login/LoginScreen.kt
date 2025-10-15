@@ -105,7 +105,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
             Text(fontWeight = FontWeight.Bold,
-                text = "Sign In With Email",
+                text = "Sign In With User Id",
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -113,7 +113,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = state.email,
                 onValueChange = viewModel::onEmailChange,
-                label = { Text("Email Id") },
+                label = { Text("Email or Phone") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -123,7 +123,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = state.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Password") },
+                label = { Text("Password or PIN") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier.fillMaxWidth()
             )
